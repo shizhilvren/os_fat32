@@ -18,6 +18,8 @@ int main(){
             }else{
                 printf(WXML);
             }
+        }else{
+            printf("·Ç·¨ÃüÁî\n");
         }
     }
 

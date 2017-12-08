@@ -3,10 +3,10 @@
 
 #include<stdio.h>
 
-#define ARGNUM      10   //æœ€å¤§å‚æ•°æ•°é‡
-#define ARGLEN      1024 //å•ä¸€å‚æ•°æœ€å¤§é•¿åº¦
-#define SUCCESS     0    //æˆåŠŸè¿”å›å€¼
-#define ERROR       -1   //å¤±è´¥è¿”å›å€¼
+#define ARGNUM      10   //×î´ó²ÎÊıÊıÁ¿
+#define ARGLEN      1024 //µ¥Ò»²ÎÊı×î´ó³¤¶È
+#define SUCCESS     0    //³É¹¦·µ»ØÖµ
+#define ERROR       -1   //Ê§°Ü·µ»ØÖµ
 #define TRUE        1
 #define FALSE       0
 #define INF         (1<<30)
@@ -15,34 +15,70 @@
 #define SPCSIZE     4096
 #define K           1024
 
+#define ATTR_READ_ONLY  0x01
+#define ATTR_HIDDEN     0x02
+#define ATTR_SYSTEM     0x04
+#define ATTR_VOLUME_ID  0x08
+#define ATTR_DIRECTORY  0x10
+#define ATTR_ARCHIVE    0x20
+#define ATTR_LONG_NAME  (ATTR_READ_ONLY|\
+                            ATTR_HIDDEN|\
+                            ATTR_SYSTEM|\
+                            ATTR_VOLUME_ID)
+#define FAT_SAVE    0x0ffffff0
+#define FAT_END     0x0fffffff
+#define FAT_BAD     0x0ffffff7
+
+
 typedef unsigned int uint;
 typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 #pragma pack(1)
+typedef struct __FAT_DS{
+    char name[8];
+    char named[3];
+    u8 DIR_Attr;
+    u8 DIR_NTRes;
+    u8 DIR_CrtTimeTeenth;
+    u16 DIR_CrtTime;
+    u16 DIR_CrtDate;
+    u16 DIR_LastAccDate;
+    u16 DIR_FstClusHI;
+    u16 DIR_WriTime;
+    u16 DIR_WrtDate;
+    u16 DIR_WriteLO;
+    u16 DIR_FileSize;
+    char recover[2];
+}FAT_DS,*FAT_DSp;
+
 typedef struct __MBR_in{
     u8 flag;
     u8 start;
-    u16 starts_c;//èµ·å§‹æ‰‡åŒºç£å¤´å·
+    u16 starts_c;//ÆğÊ¼ÉÈÇø´ÅÍ·ºÅ
     u8 FSflag;//0x0B
-    u8 end_c;//ç»“æŸç£å¤´å·
+    u8 end_c;//½áÊø´ÅÍ·ºÅ
     u16 end_sector;
     u32 strart_chan;
     u32 all;
 }MBR_in,*MBR_inp;
+
 typedef struct __MBR{
-    char recoverd[512-66];
+    char recoverd[512-66-6];
+    u32 sign;
+    char recoved[2];
     MBR_in mbr_in[4];
     u32 end;
 }MBR,*MBRp;
+
 typedef struct __BS_BPB{
     char BS_jmpBoot[3];
     char BS_OEMName[8];
     u16 BPB_BytsPerSec;
     u8 BPB_SecPerClus;
-    u16 BPB_RsvdSecCnt;//ä¿ç•™æ‰‡åŒºæ•°
-    u8 BPB_NumFATs;
+    u16 BPB_RsvdSecCnt;//±£ÁôÉÈÇøÊı
+    u8 BPB_NumFATs;//FATÊıÁ¿
     u16 BPB_RootEntCnt;
     u16 BPB_TotSec16;
     u8 BPB_Media;
@@ -52,10 +88,10 @@ typedef struct __BS_BPB{
     u32 BPB_HiddSec;
     u32 BPB_TotSec32;
 
-    u32 BPB_FATSz32;
+    u32 BPB_FATSz32;//FATÉÈÇøÊı
     u16 BPB_ExtFlags;
     u16 BPB_FSVer;
-    u32 BPB_RootClis;
+    u32 BPB_RootClis;//¸ùÄ¿Â¼´ØºÅ
     u16 BPB_FSInfo;
     u16 BPB_BkBootSec;
     char BPB_Reserved[12];
@@ -69,7 +105,29 @@ typedef struct __BS_BPB{
     // MBR mbr[4];
     u16 end;
 }BS_BPB,*BS_BPBp;
+
+typedef struct __FSInfo{
+    u32 FSI_LeadSig;
+    char recoved[480];
+    u32 FSI_StrucSig;
+    u32 FSI_Free_Count;
+    u32 FSI_Nxt_free;
+    char FSI_Reserved2[12];
+    u32 end;
+}FSInfo,*FSInfop;
+
+//512FAT±í
+typedef struct __FAT{
+    u32 fat[BLOCKSIZE/4];
+}FAT,FATp;
+
+typedef struct __FAT4K{
+    u32 fat[SPCSIZE/4];
+}FAT4K,FAT4Kp;
+
 #pragma pack()
+
+
 #define __DEBUG__
 #ifdef __DEBUG__
     #define DEBUG printf
@@ -80,30 +138,30 @@ typedef struct __BS_BPB{
     }
 #endif //__DEBUG__
 
-//å…¨å±€é”™è¯¯ç»“æ„ä½“
+//È«¾Ö´íÎó½á¹¹Ìå
 typedef struct __ERROR{
     char msg[ARGLEN];
 }ERR;
 ERR error;
 
-//å—æ“çºµå‘˜ç´ 
+//¿é²Ù×İÔ±ËØ
 typedef struct __BLOCK{
     char data[512];
 }BLOCK;
 
-//4Kå—
+//4K¿é
 typedef struct __4KBLOCK{
     BLOCK block[8];
 }BLOCK4K;
 
 
-//å‚æ•°ç»“æ„ä½“
+//²ÎÊı½á¹¹Ìå
 typedef struct __ARGV{
-    int len;   //å‚æ•°æ•°é‡
-    char argv[ARGNUM][ARGLEN];  //å‚æ•°æ•°ç»„
+    int len;   //²ÎÊıÊıÁ¿
+    char argv[ARGNUM][ARGLEN];  //²ÎÊıÊı×é
 }ARG,*ARGP;
 
-//vhdç»“æ„ä½“
+//vhd½á¹¹Ìå
 typedef struct __hd_ftr { 
   char   cookie[8];       /* Identifies original creator of the disk      */ 
   u32    features;        /* Feature Support -- see below                 */ 
@@ -127,8 +185,8 @@ typedef struct __hd_ftr {
 
 void startsys();    
 
-/*æˆåŠŸè¿”å›SUCCESS å¤±è´¥è¿”å›ERROR*/
-//å‘½ä»¤è¡Œå¯è°ƒç”¨
+/*³É¹¦·µ»ØSUCCESS Ê§°Ü·µ»ØERROR*/
+//ÃüÁîĞĞ¿Éµ÷ÓÃ
 int my_format(const ARGP arg);
 int my_cd(const ARGP arg);
 int my_mkdir(const ARGP arg);

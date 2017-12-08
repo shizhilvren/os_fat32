@@ -4,7 +4,7 @@
 #include<string.h>
 
 
-//å­—ç¬¦ä¸²è½¬æ¢æˆæ•´ é”™è¯¯è¿”å›INF
+//×Ö·û´®×ª»»³ÉÕû ´íÎó·µ»ØINF
 int ctoi(const char* ch){
     int ret=0;
     for(uint i=0;i<strlen(ch);i++){
@@ -18,7 +18,7 @@ int ctoi(const char* ch){
     return ret;
 }
 
-//å–å¾—å‚æ•° 
+//È¡µÃ²ÎÊı 
 void getargv(ARGP argp){
     char cmd[ARGLEN*10];
     if(gets(cmd)==NULL){
@@ -38,6 +38,7 @@ void getargv(ARGP argp){
             len=0;
         }
         (argp->argv)[num-1][len]=cmd[i];
+        (argp->argv)[num-1][len+1]=0;
         len++;
         flag=1;
     }
