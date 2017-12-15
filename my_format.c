@@ -87,14 +87,40 @@ void BS_BPSset(BS_BPBp bs_bpb,int size,int hiden){
 }
 
 int my_format(const ARGP arg){
+    char fatName[8]="WLT    ";
+    char fileName[ARGLEN]="fs.vhd";
+    const char helpstr[]=
+"语法格式    format size [name [namefile]]\n\
+szie        磁盘大小 单位MB\n\
+name        卷标名\n\
+namefile    虚拟磁盘文件路径（当前目录下开始）\n";
     DEBUG("%d",sizeof(BS_BPB));
     BLOCK4K block4k;
     FILE *fp=NULL;
-    if(arg->len!=1){
-        strcpy(error.msg,"参数数量错误\n\x00");
-        printf("参数数量错误\n");
-        return ERROR;
+    switch(arg->len){
+        case 3:
+            my_strcpy(fileName,arg->argv[2],ARGLEN);
+        case 2:
+            my_strcpy(fatName,arg->argv[1],8);
+        case 1:
+            if(strcmp(arg->argv[0],"/?")==0 && arg->len==1){
+                printf(helpstr);
+                return SUCCESS;
+            }else{
+                break;
+            }
+            break;
+        default:
+            strcpy(error.msg,"参数数量错误\n\x00");
+            printf("参数数量错误\n");
+            return ERROR;
     }
+    // if(arg->len>3){
+    //     strcpy(error.msg,"参数数量错误\n\x00");
+    //     printf("参数数量错误\n");
+    //     return ERROR;
+    // }
+    
     DEBUG("%s %d",arg->argv[0],ctoi(arg->argv[0]));
     int size=ctoi(arg->argv[0]);
     if(size<MIN||size>MAX){
@@ -104,12 +130,13 @@ int my_format(const ARGP arg){
     }
     int cut=size*K*K/SPCSIZE;
     DEBUG("%d %d\n",sizeof(BLOCK),sizeof(BLOCK4K));
-    fp=fopen("fs.vhd","wb");
+    fp=fopen(fileName,"wb");
     if(fp==NULL){
         strcpy(error.msg,"文件打开错误\n\x00");
         printf("文件打开量错误\n");
         return ERROR;
     }
+    //生成文件本体
     memset(&block4k,0,SPCSIZE);
     for(int i=0;i<cut;i++){
         do_write_block4k(fp,&block4k,-1);
@@ -138,7 +165,7 @@ int my_format(const ARGP arg){
     BLOCK block;
     FAT_DSp fatdsp=(FAT_DSp)&block;
     memset(fatdsp,0,sizeof(FAT_DS));
-    my_strcpy(fatdsp->name,"WLT    ",8);
+    my_strcpy(fatdsp->name,fatName,8);
     my_strcpy(fatdsp->named,"   ",3);
     fatdsp->DIR_Attr=ATTR_VOLUME_ID;
     do_write_block(fp,&block,start/8,start%8);
@@ -148,13 +175,13 @@ int my_format(const ARGP arg){
     // do_write_block(fp,(BLOCK*)&bs_pbp,mbr.mbr_in[0].strart_chan*BLOCKSIZE/SPCSIZE,(mbr.mbr_in[0].strart_chan*BLOCKSIZE%SPCSIZE)/BLOCKSIZE);
     do_write_block(fp,(BLOCK*)&fsi,mbr.mbr_in[0].strart_chan*BLOCKSIZE/SPCSIZE,(mbr.mbr_in[0].strart_chan*BLOCKSIZE%SPCSIZE)/BLOCKSIZE+1);
     
-    //fat设置
+    //fat设置 (根目录初始化)
     int str_fat1;
     str_fat1=bs_pbp.BPB_RsvdSecCnt+mbr.mbr_in[0].strart_chan;
     int str_fat2=bs_pbp.BPB_RsvdSecCnt+bs_pbp.BPB_FATSz32+mbr.mbr_in[0].strart_chan;
     FAT fat;
     fat.fat[0]=0x0ffffff8;
-    for(int i=1;i<=bs_pbp.BPB_RootClis;i++){
+    for(u32 i=1;i<=bs_pbp.BPB_RootClis;i++){
         fat.fat[i]=FAT_END;
     }
     // fat.fat[bs_pbp.BPB_RootEntCnt]=
