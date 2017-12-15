@@ -8,6 +8,7 @@ int main(){
     char cmd[ARGLEN];
     ARG argv;
     FileSystemInfo fileSysInfo;
+    int flag;
     while(TRUE){
         scanf("%s",cmd);
         getargv(&argv);
@@ -16,13 +17,12 @@ int main(){
         }else if(strcmp(cmd,"load")==0){
             my_load(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
-            if(argv.len==0){
+            flag=my_exitsys(&argv,&fileSysInfo);
+            if(flag==SUCCESS){
                 break;
-            }else{
-                printf(WXML);
             }
         }else{
-            printf("∑«∑®√¸¡Ó\n");
+            printf(WXML);
         }
     }
 

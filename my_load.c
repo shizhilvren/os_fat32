@@ -10,7 +10,9 @@
 int my_load(const ARGP arg,FileSystemInfop fileSystemInfop){
     char fileName[ARGLEN]="fs.vhd";
     const char helpstr[]=
-"语法格式    load [namefile]\n\
+"\
+功能        加载文件系统\n\
+语法格式    load [namefile]\n\
 namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
     FILE *fp=NULL;
     MBR mbr;

@@ -90,7 +90,9 @@ int my_format(const ARGP arg){
     char fatName[8]="WLT    ";
     char fileName[ARGLEN]="fs.vhd";
     const char helpstr[]=
-"语法格式    format size [name [namefile]]\n\
+"\
+功能         格式化文件系统\n\
+语法格式     format size [name [namefile]]\n\
 szie        磁盘大小 单位MB\n\
 name        卷标名  默认 WTL\n\
 namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";

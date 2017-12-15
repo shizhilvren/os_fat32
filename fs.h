@@ -246,6 +246,9 @@ void startsys();
 int my_format(const ARGP arg);
 //打开文件但未关闭
 int my_load(const ARGP arg,FileSystemInfop fileSystemInfop);
+//退出文件系统
+int my_exitsys(const ARGP arg,FileSystemInfop fileSystemInfop);
+
 int my_cd(const ARGP arg);
 int my_mkdir(const ARGP arg);
 int my_rmdir(const ARGP arg);
