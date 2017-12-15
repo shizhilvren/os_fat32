@@ -1,1 +1,1 @@
-gcc -g -W main.c my_format.c tool.c -o fs.exe
+gcc -g -W main.c my_format.c tool.c my_load.c -o fs.exe

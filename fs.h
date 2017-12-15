@@ -3,10 +3,10 @@
 
 #include<stdio.h>
 
-#define ARGNUM      10   //����������
-#define ARGLEN      1024 //��һ������󳤶�
-#define SUCCESS     0    //�ɹ�����ֵ
-#define ERROR       -1   //ʧ�ܷ���ֵ
+#define ARGNUM      10   /* 最大参数数量 */
+#define ARGLEN      1024 /*  单一参数最大长度 */
+#define SUCCESS     0    /* 成功返回值 */
+#define ERROR       -1   /* 失败返回值 */
 #define TRUE        1
 #define FALSE       0
 #define INF         (1<<30)
@@ -29,12 +29,57 @@
 #define FAT_END     0x0fffffff
 #define FAT_BAD     0x0ffffff7
 
-
-typedef unsigned int uint;
 typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
+
+//文件系统基本信息 重要
+    /*
+        常用数据 
+        以下数据涉及的扇区号都从绝对磁盘簇起
+        若为定义扇区数则默认为该簇第0扇
+    */
+typedef struct __FileSystemInfo{
+    /*  结构体是否有效TRUE 或FALSE */
+    u32 flag;       
+    /* .vhd路径 */
+    char fileName[ARGLEN];
+    /* 读写文件指针 */
+    FILE* fp;       
+    /* 根目录扇区号 */
+    u32 rootNum;    
+    /* 分区表位置 簇 */
+    u32 FAT[8];  
+
+    /* MBR表部分 */
+    /* 区前隐藏扇区数 */
+    u32 MBR_start;  
+    /* 区扇区数 */
+    u32 MBR_size;   
+
+   /*  fat一扇区BPB、BS部分 */
+   /* 每扇区字节数 通常为512 */
+    u16 BPB_BytsPerSec; 
+    /* 每簇扇区数  通常为8 */
+    u8  BPB_SecPerClus; 
+    /* 保留扇区数目 通常为32 */
+    u16 BPB_RsvdSecCnt;
+    /* FAT表数量 */ 
+    u8  BPB_NumFATs;    
+    /* 该分区前隐藏扇区数 */
+    u32 BPB_HiddSec;    
+    /* 该分区总扇区数 */
+    u32 BPB_TotSec32;   
+    /* fat表所占扇区数 */
+    u32 BPB_FATSz32;    
+    /* 根本目录所在第一扇区数 */
+    u32 BPB_RootClis;   
+    /* 保留区引导扇所占扇区数 通常为6 */
+    u16 BPB_BkBootSec;  
+
+}FileSystemInfo,*FileSystemInfop;
+
 #pragma pack(1)
 typedef struct __FAT_DS{
     char name[8];
@@ -56,11 +101,16 @@ typedef struct __FAT_DS{
 typedef struct __MBR_in{
     u8 flag;
     u8 start;
-    u16 starts_c;//��ʼ������ͷ��
-    u8 FSflag;//0x0B
-    u8 end_c;//������ͷ��
+    /* 起始扇区磁头号 */
+    u16 starts_c;
+    /* 0x0B */
+    u8 FSflag;
+    /* 结束磁头号 */
+    u8 end_c;
     u16 end_sector;
+    /* 分区起始扇区号 */
     u32 strart_chan;
+    /* 分区总扇区数 */
     u32 all;
 }MBR_in,*MBR_inp;
 
@@ -77,8 +127,10 @@ typedef struct __BS_BPB{
     char BS_OEMName[8];
     u16 BPB_BytsPerSec;
     u8 BPB_SecPerClus;
-    u16 BPB_RsvdSecCnt;//����������
-    u8 BPB_NumFATs;//FAT����
+    /* 保留扇区数 */
+    u16 BPB_RsvdSecCnt;
+    /* FAT数量 */
+    u8 BPB_NumFATs;
     u16 BPB_RootEntCnt;
     u16 BPB_TotSec16;
     u8 BPB_Media;
@@ -88,10 +140,12 @@ typedef struct __BS_BPB{
     u32 BPB_HiddSec;
     u32 BPB_TotSec32;
 
-    u32 BPB_FATSz32;//FAT������
+    /* FAT扇区数 */
+    u32 BPB_FATSz32;
     u16 BPB_ExtFlags;
     u16 BPB_FSVer;
-    u32 BPB_RootClis;//��Ŀ¼�غ�
+    /* 根目录簇号 */
+    u32 BPB_RootClis;
     u16 BPB_FSInfo;
     u16 BPB_BkBootSec;
     char BPB_Reserved[12];
@@ -116,7 +170,7 @@ typedef struct __FSInfo{
     u32 end;
 }FSInfo,*FSInfop;
 
-//512FAT��
+//512FAT表
 typedef struct __FAT{
     u32 fat[BLOCKSIZE/4];
 }FAT,FATp;
@@ -138,30 +192,32 @@ typedef struct __FAT4K{
     }
 #endif //__DEBUG__
 
-//ȫ�ִ���ṹ��
+//全局错误结构体
 typedef struct __ERROR{
     char msg[ARGLEN];
 }ERR;
 ERR error;
 
-//�����Ա��
+//块操纵员素
 typedef struct __BLOCK{
     char data[512];
 }BLOCK;
 
-//4K��
+//4K块
 typedef struct __4KBLOCK{
     BLOCK block[8];
 }BLOCK4K;
 
 
-//�����ṹ��
+//参数结构体
 typedef struct __ARGV{
-    int len;   //��������
-    char argv[ARGNUM][ARGLEN];  //��������
+    /* 参数数量 */
+    int len;   
+    /* 参数数组 */
+    char argv[ARGNUM][ARGLEN];  
 }ARG,*ARGP;
 
-//vhd�ṹ��
+//vhd结构体
 typedef struct __hd_ftr { 
   char   cookie[8];       /* Identifies original creator of the disk      */ 
   u32    features;        /* Feature Support -- see below                 */ 
@@ -185,9 +241,11 @@ typedef struct __hd_ftr {
 
 void startsys();    
 
-/*�ɹ�����SUCCESS ʧ�ܷ���ERROR*/
-//�����пɵ���
+/*成功返回SUCCESS 失败返回ERROR*/
+//命令行可调用
 int my_format(const ARGP arg);
+//打开文件但未关闭
+int my_load(const ARGP arg,FileSystemInfop fileSystemInfop);
 int my_cd(const ARGP arg);
 int my_mkdir(const ARGP arg);
 int my_rmdir(const ARGP arg);

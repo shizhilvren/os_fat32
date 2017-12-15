@@ -7,7 +7,7 @@
 //字符串转换成整 错误返回INF
 int ctoi(const char* ch){
     int ret=0;
-    for(uint i=0;i<strlen(ch);i++){
+    for(u32 i=0;i<strlen(ch);i++){
         ret*=10;
         if('0'<=ch[i]&&ch[i]<='9'){
             ret+=ch[i]-'0';
@@ -28,7 +28,7 @@ void getargv(ARGP argp){
     int num=0;
     int len=0;
     int flag=0;
-    for(uint i=0;i<strlen(cmd);i++){
+    for(u32 i=0;i<strlen(cmd);i++){
         if(cmd[i]==' ' ||cmd[i]=='\t' ||cmd[i]=='\r'){
             flag=0;
             continue;
@@ -59,6 +59,23 @@ int do_write_block(FILE*fp,BLOCK* block,int offset,int num){
     }else{
         fseek(fp,offset*SPCSIZE+num*BLOCKSIZE,SEEK_SET);
         return fwrite(block,sizeof(BLOCK),1,fp);
+    }
+}
+
+int do_read_block4k(FILE*fp,BLOCK4K* block4k,int offset){
+    if(offset==-1){
+        return fread(block4k,sizeof(BLOCK4K),1,fp);
+    }else{
+        fseek(fp,offset*SPCSIZE,SEEK_SET);
+        return fread(block4k,sizeof(BLOCK4K),1,fp);
+    }
+}
+int do_read_block(FILE*fp,BLOCK* block,int offset,int num){
+    if(offset==-1){
+        return fread(block,sizeof(BLOCK),1,fp);
+    }else{
+        fseek(fp,offset*SPCSIZE+num*BLOCKSIZE,SEEK_SET);
+        return fread(block,sizeof(BLOCK),1,fp);
     }
 }
 

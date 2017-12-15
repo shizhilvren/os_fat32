@@ -70,7 +70,7 @@ void BS_BPSset(BS_BPBp bs_bpb,int size,int hiden){
     bs_bpb->BPB_TotSec32=size/BLOCKSIZE;
 
     int x=size/SPCSIZE/(512/4);
-    bs_bpb->BPB_FATSz32=x+(8-x%8);
+    bs_bpb->BPB_FATSz32=x+(8-x%8);//强制4k对齐
     bs_bpb->BPB_ExtFlags=0;
     bs_bpb->BPB_FSVer=0;
     bs_bpb->BPB_RootClis=2;
@@ -92,8 +92,8 @@ int my_format(const ARGP arg){
     const char helpstr[]=
 "语法格式    format size [name [namefile]]\n\
 szie        磁盘大小 单位MB\n\
-name        卷标名\n\
-namefile    虚拟磁盘文件路径（当前目录下开始）\n";
+name        卷标名  默认 WTL\n\
+namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
     DEBUG("%d",sizeof(BS_BPB));
     BLOCK4K block4k;
     FILE *fp=NULL;
@@ -179,6 +179,7 @@ namefile    虚拟磁盘文件路径（当前目录下开始）\n";
     int str_fat1;
     str_fat1=bs_pbp.BPB_RsvdSecCnt+mbr.mbr_in[0].strart_chan;
     int str_fat2=bs_pbp.BPB_RsvdSecCnt+bs_pbp.BPB_FATSz32+mbr.mbr_in[0].strart_chan;
+    DEBUG("%d %d\n",str_fat1,str_fat2);
     FAT fat;
     fat.fat[0]=0x0ffffff8;
     for(u32 i=1;i<=bs_pbp.BPB_RootClis;i++){
@@ -191,4 +192,5 @@ namefile    虚拟磁盘文件路径（当前目录下开始）\n";
     fclose(fp);
     DEBUG("磁盘申请成功\n");
     // if()
+    return SUCCESS;
 }
