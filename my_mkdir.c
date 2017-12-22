@@ -1,90 +1,124 @@
 #include"fs.h"
 #include"tool.h"
 #include<memory.h>
+#include<ctype.h>
 
-int nameCheck(const char* name){
+int nameCheck(const char name[ARGLEN]){
+    if(strlen(name)>11||strlen(name)<=0){
+        return ERROR;
+    }
+    for(int i=0;i<11;i++){
+        if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
+                 name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
+                  name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
+                  name[i]=='!' || name[i]=='(' || name[i]==')' || name[i]=='{' || 
+                  name[i]=='}' || name[i]=='^' || name[i]=='#' || name[i]=='&')){
+            return ERROR;
+        }
+    }
     return SUCCESS;
 }
 
 int my_mkdir(const ARGP arg,FileSystemInfop fileSystemInfop){
     const char helpstr[]=
 "\
-åŠŸèƒ½        åˆ›å»ºæ–‡ä»¶å¤¹\n\
-è¯­æ³•æ ¼å¼    mkdir name\n\
-name       åˆ›å»ºæ–‡ä»¶å¤¹çš„åå­—\n";
+¹¦ÄÜ        ´´½¨ÎÄ¼þ¼Ð\n\
+Óï·¨¸ñÊ½    mkdir name\n\
+name       ´´½¨ÎÄ¼þ¼ÐµÄÃû×Ö\n\
+±¸×¢       ÎÄ¼þÃûÇ¿ÖÆ×ªÎª´óÐ´£¬ÎÄ¼þÃû×î³¤²»³¬¹ý11Î»\n";
     char name[ARGLEN];
     FAT_DS_BLOCK4K fat_ds;
+    if(fileSystemInfop->flag==FALSE){
+        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼þÏµÍ³\n\x00");
+        printf("Î´Ö¸¶¨ÎÄ¼þÏµÍ³\n");
+        return ERROR;
+    }
     switch(arg->len){
         case 1:
             if(strcmp(arg->argv[0],"/?")==0){
                 printf(helpstr);
                 return SUCCESS;
             }else{
-                memset(name,0,ARGLEN);
+                memset(name,' ',ARGLEN);
                 my_strcpy(name,arg->argv[0],strlen(arg->argv[0]));
-
+                name[11]='\0';
+                if(nameCheck(name)==ERROR){
+                    strcpy(error.msg,"ÎÄ¼þÃû¹ý³¤»ò´æÔÚ·Ç·¨×Ö·û\n\x00");
+                    printf("ÎÄ¼þÃû¹ý³¤»ò´æÔÚ·Ç·¨×Ö·û\n");
+                    return ERROR;
+                }
+                for(int i=0;i<11;i++){
+                    name[i]=toupper(name[i]);
+                }
+                name[11]='\0';
             }
             break;
         case 0:
-            break;
+            DEBUG("ÎÄ¼þÃû¿Õ\n");
+            return SUCCESS;
         default:
         error:;
-            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
-            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
+            strcpy(error.msg,"²ÎÊýÊýÁ¿´íÎó\n\x00");
+            printf("²ÎÊýÊýÁ¿´íÎó\n");
             return ERROR;
     }
+
     u32 pathNum=fileSystemInfop->pathNum;
     u32 cut;
     while(TRUE){
         do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
         for(cut=0;cut<SPCSIZE/32;cut++){
+            char lin[12];
+            my_strcpy(lin,fat_ds.fat[cut].name,11);
+            lin[11]='\0';
             if(fat_ds.fat[cut].DIR_Attr==0){
                 break;
+            }else if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY) && 
+                            strcmp(name,lin)==0 ){
+                strcpy(error.msg,"ÎÄ¼þÒÑ´æÔÚ\n\x00");
+                printf("ÎÄ¼þÒÑ´æÔÚ\n");
+                return ERROR;
             }
         }
-        if(cut==SPCSIZE){
+        if(cut==SPCSIZE/32){
             u32 lin=pathNum;
             pathNum=getNext(fileSystemInfop,pathNum);
             if(pathNum==FAT_END){
-                //å…¨éƒ½æ²¡æœ‰åˆ†é…ä¸€ä¸ª
+                //È«¶¼Ã»ÓÐ·ÖÅäÒ»¸ö
                 pathNum=newfree(fileSystemInfop,lin);
                 if(pathNum==FAT_FREE){
-                    strcpy(error.msg,"ç£ç›˜ç©ºé—´ä¸è¶³\n\x00");
-                    printf("ç£ç›˜ç©ºé—´ä¸è¶³\n");
+                    strcpy(error.msg,"´ÅÅÌ¿Õ¼ä²»×ã\n\x00");
+                    printf("´ÅÅÌ¿Õ¼ä²»×ã\n");
                     return ERROR;
                 }
             }
         }else{
-            //æ‰¾åˆ°äº†ç©ºçš„
-            //å–å¾—. ä¸Ž..
+            //ÕÒµ½ÁË¿ÕµÄ
+            //È¡µÃ. Óë..
             u32 pathnumd=newfree(fileSystemInfop,0);
-            u32 pathnumdd=newfree(fileSystemInfop,0);
             FAT_DS_BLOCK4K fat_ds_d;
-            FAT_DS_BLOCK4K fat_ds_dd;
             memset(&fat_ds_d,0,SPCSIZE);
-            memset(&fat_ds_dd,0,SPCSIZE);
             my_strcpy(fat_ds_d.fat[0].name,".           ",11);
-            my_strcpy(fat_ds_dd.fat[0].name,"..          ",11);
-            fat_ds_d.fat[0].DIR_Attr=
-
-
+            my_strcpy(fat_ds_d.fat[1].name,"..          ",11);
+            fat_ds_d.fat[0].DIR_Attr=ATTR_DIRECTORY;
+            fat_ds_d.fat[1].DIR_Attr=ATTR_DIRECTORY;
+            fat_ds_d.fat[0].DIR_FstClusHI=(u16)(pathnumd>>16);
+            fat_ds_d.fat[0].DIR_FstClusLO=(u16)(pathnumd&0x0000ffff);
+            fat_ds_d.fat[1].DIR_FstClusHI=(u16)(pathNum>>16);
+            fat_ds_d.fat[1].DIR_FstClusLO=(u16)(pathNum&0x0000ffff);
+            do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds_d,L2R(fileSystemInfop,pathnumd));
             
             memset(&fat_ds.fat[cut],0,sizeof(FAT_DS));
             my_strcpy(fat_ds.fat[cut].name,name,11);
+            fat_ds.fat[cut].DIR_FstClusHI=(u16)(pathnumd>>16);
+            fat_ds.fat[cut].DIR_FstClusLO=(u16)(pathnumd&0x0000ffff);
             fat_ds.fat[cut].DIR_Attr=ATTR_DIRECTORY;
             
-            //å†™å…¥æ–°å»ºæ–‡ä»¶
-            do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
+            //Ð´ÈëÐÂ½¨ÎÄ¼þ
+            do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
+            DEBUG("´´½¨³É¹¦\n");
             break;
         }
     }
-    
-    
-
-
-    
-
-
-
     return SUCCESS;
 }

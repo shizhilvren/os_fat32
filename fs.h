@@ -78,7 +78,7 @@ typedef struct __FileSystemInfo{
     u32 BPB_TotSec32;   
     /* fat表所占扇区数 */
     u32 BPB_FATSz32;    
-    /* 根本目录所在第一扇区数 */
+    /* 根本目录所在第一扇区数  逻辑*/
     u32 BPB_RootClis;   
     /* 保留区引导扇所占扇区数 通常为6 */
     u16 BPB_BkBootSec;  
@@ -186,12 +186,12 @@ typedef struct __FAT4K{
 
 /* fat目录项512 */
 typedef struct __FAT_DS_BLOCK{
-    FAT_DS fat[BLOCKSIZE/sizeof(FAT_DS)]
+    FAT_DS fat[BLOCKSIZE/sizeof(FAT_DS)];
 }FAT_DS_BLOCK,*FAT_DS_BLOCKp;
 
 /* fat目录项4K */
 typedef struct __FAT_DS_BLOCK4K{
-    FAT_DS fat[SPCSIZE/sizeof(FAT_DS)]
+    FAT_DS fat[SPCSIZE/sizeof(FAT_DS)];
 }FAT_DS_BLOCK4K,*FAT_DS_BLOCK4Kp;
 #pragma pack()
 

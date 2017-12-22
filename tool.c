@@ -38,7 +38,10 @@ int do_read_block(FILE*fp,BLOCK* block,int offset,int num){
 }
 
 u32 L2R(FileSystemInfop fsip,u32 num){
-     return (fsip->MBR_start+
+    // DEBUG("lj %u->%u\n",num,(fsip->MBR_start+
+            // fsip->BPB_RsvdSecCnt+
+            // fsip->BPB_FATSz32*fsip->BPB_NumFATs)/fsip->BPB_SecPerClus+num-2);
+    return (fsip->MBR_start+
             fsip->BPB_RsvdSecCnt+
             fsip->BPB_FATSz32*fsip->BPB_NumFATs)/fsip->BPB_SecPerClus+num-2;
 }
@@ -58,7 +61,7 @@ int newfree(FileSystemInfop fsip,u32 num){
     FAT fat;
     u32 cuNum=num/(512/4);
     u32 index=num%(512/4);
-    for(int i=0;i<fsip->BPB_FATSz32;i++){
+    for(u32 i=0;i<fsip->BPB_FATSz32;i++){
         do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+i)/8,(fsip->FAT[0]+i)%8);
         for(int j=0;j<512/4;j++){
             if(fat.fat[j]==FAT_FREE){

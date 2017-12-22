@@ -19,6 +19,8 @@ int main(){
             my_format(&argv);
         }else if(strcmp(cmd,"load")==0){
             my_load(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"mkdir")==0){
+            my_mkdir(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
             flag=my_exitsys(&argv,&fileSysInfo);
             if(flag==SUCCESS){

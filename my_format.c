@@ -2,6 +2,7 @@
 #include"tool.h"
 #include<stdlib.h>
 #include<string.h>
+#include<ctype.h>
 /*
     接受一个参数 不得小于256MB 不得大于2097152MB(2TB)
     默认一个磁盘块512B 一簇4KB 8个块
@@ -87,7 +88,7 @@ void BS_BPSset(BS_BPBp bs_bpb,int size,int hiden){
 }
 
 int my_format(const ARGP arg){
-    char fatName[8]="WLT    ";
+    char fatName[8]="WLt    ";
     char fileName[ARGLEN]="fs.vhd";
     const char helpstr[]=
 "\
