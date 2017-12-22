@@ -45,6 +45,7 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
     fileSystemInfop->flag=TRUE;
     fileSystemInfop->fp=fp;
     strcpy(fileSystemInfop->fileName,fileName);
+    strcpy(fileSystemInfop->path,"/");
 
     //MBR部分
     do_read_block(fp,(BLOCK*)&mbr,0,0);
@@ -72,6 +73,8 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
     for(u32 i=0;i<fileSystemInfop->BPB_NumFATs;i++){
         fileSystemInfop->FAT[i]=start+i*fileSystemInfop->BPB_FATSz32;
     }
+    fileSystemInfop->pathNum=fileSystemInfop->BPB_RootClis;
+    
     DEBUG("%s 加载成功!\n",fileSystemInfop->fileName);
     DEBUG("根目录簇号 %d\n",fileSystemInfop->rootNum);
     DEBUG("簇 %d %d\n",fileSystemInfop->FAT[0],fileSystemInfop->FAT[1]);

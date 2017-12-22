@@ -35,11 +35,11 @@ typedef unsigned short u16;
 typedef unsigned char u8;
 
 //文件系统基本信息 重要
-    /*
-        常用数据 
-        以下数据涉及的扇区号都从绝对磁盘簇起
-        若为定义扇区数则默认为该簇第0扇
-    */
+/*
+    常用数据 
+    以下数据涉及的扇区号都从绝对磁盘簇起
+    若为定义扇区数则默认为该簇第0扇
+*/
 typedef struct __FileSystemInfo{
     /*  结构体是否有效TRUE 或FALSE */
     u32 flag;       
@@ -51,6 +51,10 @@ typedef struct __FileSystemInfo{
     u32 rootNum;    
     /* 分区表位置 簇 */
     u32 FAT[8];  
+    /* 当前路径  定义为 / 防止转义爆炸  */
+    char path[ARGLEN];
+    /* 当前路径簇号 */
+    u32 pathNum;
 
     /* MBR表部分 */
     /* 区前隐藏扇区数 */
@@ -249,12 +253,12 @@ int my_load(const ARGP arg,FileSystemInfop fileSystemInfop);
 //退出文件系统
 int my_exitsys(const ARGP arg,FileSystemInfop fileSystemInfop);
 
-int my_cd(const ARGP arg);
-int my_mkdir(const ARGP arg);
-int my_rmdir(const ARGP arg);
-int my_dir(const ARGP arg);
-int my_create(const ARGP arg);
-int my_rm(const ARGP arg);
+int my_cd(const ARGP arg,FileSystemInfop fileSystemInfop);
+int my_mkdir(const ARGP arg,FileSystemInfop fileSystemInfop);
+int my_rmdir(const ARGP arg,FileSystemInfop fileSystemInfop);
+int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop);
+int my_create(const ARGP arg,FileSystemInfop fileSystemInfop);
+int my_rm(const ARGP arg,FileSystemInfop fileSystemInfop);
 
 int my_open();
 int my_close();

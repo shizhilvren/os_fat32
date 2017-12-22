@@ -8,10 +8,13 @@ int main(){
     char cmd[ARGLEN];
     ARG argv;
     FileSystemInfo fileSysInfo;
-    int flag;
+    fileSysInfo.flag=FALSE;
+    int flag;//执行状态标志位
     while(TRUE){
         scanf("%s",cmd);
-        getargv(&argv);
+        if(getargv(&argv)==ERROR){
+            printf(WXML);
+        }
         if(strcmp(cmd,"format")==0){
             my_format(&argv);
         }else if(strcmp(cmd,"load")==0){

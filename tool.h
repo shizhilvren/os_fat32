@@ -31,7 +31,7 @@
 //字符转数字 出错返回INF
 int ctoi(const char* ch);
 //取得参数
-void getargv(ARGP argp);
+int getargv(ARGP argp);
 
 //实际写入函数 offext为偏移块数 为-1时保持文件默认指针 
 int do_write_block4k(FILE*fp,BLOCK4K* block4k,int offset);
@@ -41,6 +41,11 @@ int do_write_block(FILE*fp,BLOCK* block,int offset,int num);
 int do_read_block4k(FILE*fp,BLOCK4K* block4k,int offset);
 //实际读入函数 offext为偏移块数 为-1时保持文件默认指针 num 为第几块0-7
 int do_read_block(FILE*fp,BLOCK* block,int offset,int num);
+
+//取得一个空闲簇簇号 num簇号
+int newfree(FileSystemInfop fsip,u32 num);
+//释放一个已用簇 num簇号
+int delfree(FileSystemInfop fsip,u32 num);
 
 //与系统的区别不检查\0x00
 char* my_strcpy(char *to,const char*from,int size );
