@@ -32,6 +32,8 @@
 int ctoi(const char* ch);
 //取得参数
 int getargv(ARGP argp);
+//逻辑簇转实际簇号
+u32 L2R(FileSystemInfop fsip,u32 num);
 
 //实际写入函数 offext为偏移块数 为-1时保持文件默认指针 
 int do_write_block4k(FILE*fp,BLOCK4K* block4k,int offset);
@@ -42,8 +44,10 @@ int do_read_block4k(FILE*fp,BLOCK4K* block4k,int offset);
 //实际读入函数 offext为偏移块数 为-1时保持文件默认指针 num 为第几块0-7
 int do_read_block(FILE*fp,BLOCK* block,int offset,int num);
 
-//取得一个空闲簇簇号 num簇号
-int newfree(FileSystemInfop fsip,u32 num);
+/* 取得一个空闲簇簇号 返回0失败，否则返回空闲簇好 num为要取得新的空间的逻辑簇号 
+    若 num=0则不连接否则标记num下一块为新取得的
+*/
+u32 newfree(FileSystemInfop fsip,u32 num);
 //释放一个已用簇 num簇号
 int delfree(FileSystemInfop fsip,u32 num);
 

@@ -67,13 +67,14 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
 // bs_pbp.BPB_FATSz32*bs_pbp.BPB_NumFATs+bs_pbp.BPB_RsvdSecCnt+mbr.mbr_in[0].strart_chan+(bs_pbp.BPB_RootClis-2)*bs_pbp.BPB_SecPerClus;
     fileSystemInfop->rootNum=fileSystemInfop->MBR_start+
                     fileSystemInfop->BPB_RsvdSecCnt+
-                    fileSystemInfop->BPB_FATSz32*fileSystemInfop->BPB_NumFATs;
+                    fileSystemInfop->BPB_FATSz32*fileSystemInfop->BPB_NumFATs+
+                    (fileSystemInfop->BPB_RootClis-2)*fileSystemInfop->BPB_SecPerClus;
     u32 start=fileSystemInfop->MBR_start+
                     fileSystemInfop->BPB_RsvdSecCnt;
     for(u32 i=0;i<fileSystemInfop->BPB_NumFATs;i++){
         fileSystemInfop->FAT[i]=start+i*fileSystemInfop->BPB_FATSz32;
     }
-    fileSystemInfop->pathNum=fileSystemInfop->BPB_RootClis;
+    fileSystemInfop->pathNum=fileSystemInfop->BPB_RootClis/8;
     
     DEBUG("%s 加载成功!\n",fileSystemInfop->fileName);
     DEBUG("根目录簇号 %d\n",fileSystemInfop->rootNum);

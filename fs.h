@@ -28,6 +28,7 @@
 #define FAT_SAVE    0x0ffffff0
 #define FAT_END     0x0fffffff
 #define FAT_BAD     0x0ffffff7
+#define FAT_FREE    0x0
 
 typedef unsigned long long u64;
 typedef unsigned int u32;
@@ -53,7 +54,7 @@ typedef struct __FileSystemInfo{
     u32 FAT[8];
     /* 当前路径  定义为 / 防止转义爆炸  */
     char path[ARGLEN];
-    /* 当前路径簇号 */
+    /* 当前路径簇号 逻辑的 */
     u32 pathNum;
 
     /* MBR表部分 */
@@ -97,9 +98,9 @@ typedef struct __FAT_DS{
     u16 DIR_FstClusHI;
     u16 DIR_WriTime;
     u16 DIR_WrtDate;
-    u16 DIR_WriteLO;
+    u16 DIR_FstClusLO;
     u16 DIR_FileSize;
-    char recover[2];
+    char cover[2];
 }FAT_DS,*FAT_DSp;
 
 typedef struct __MBR_in{

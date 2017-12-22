@@ -37,6 +37,12 @@ int do_read_block(FILE*fp,BLOCK* block,int offset,int num){
     }
 }
 
+u32 L2R(FileSystemInfop fsip,u32 num){
+     return (fsip->MBR_start+
+            fsip->BPB_RsvdSecCnt+
+            fsip->BPB_FATSz32*fsip->BPB_NumFATs)/fsip->BPB_SecPerClus+num-2;
+}
+
 u32 getNext(FileSystemInfop fsip,u32 num){
     if(num/(512/4)>fsip->BPB_FATSz32){
         return 0;
@@ -49,7 +55,25 @@ u32 getNext(FileSystemInfop fsip,u32 num){
 }
 
 int newfree(FileSystemInfop fsip,u32 num){
-    return SUCCESS;
+    FAT fat;
+    u32 cuNum=num/(512/4);
+    u32 index=num%(512/4);
+    for(int i=0;i<fsip->BPB_FATSz32;i++){
+        do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+i)/8,(fsip->FAT[0]+i)%8);
+        for(int j=0;j<512/4;j++){
+            if(fat.fat[j]==FAT_FREE){
+                fat.fat[j]=FAT_END;
+                do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+i)/8,(fsip->FAT[0]+i)%8);
+                if(num!=0){
+                    do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+                    fat.fat[index]=i*(512/4)+j;
+                    do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+                }
+                return i*(512/4)+j;
+            }
+        }
+    }
+    return 0;
 }
 
 char* my_strcpy(char *to,const char*from,int size ){
