@@ -47,6 +47,9 @@ int newfree(FileSystemInfop fsip,u32 num);
 //释放一个已用簇 num簇号
 int delfree(FileSystemInfop fsip,u32 num);
 
+/* 取得num簇的下一簇 返回下一簇编号 出错返回0*/
+u32 getNext(FileSystemInfop fsip,u32 num);
+
 //与系统的区别不检查\0x00
 char* my_strcpy(char *to,const char*from,int size );
 #endif 

@@ -48,9 +48,9 @@ typedef struct __FileSystemInfo{
     /* 读写文件指针 */
     FILE* fp;       
     /* 根目录扇区号 */
-    u32 rootNum;    
+    u32 rootNum;
     /* 分区表位置 簇 */
-    u32 FAT[8];  
+    u32 FAT[8];
     /* 当前路径  定义为 / 防止转义爆炸  */
     char path[ARGLEN];
     /* 当前路径簇号 */
@@ -183,6 +183,15 @@ typedef struct __FAT4K{
     u32 fat[SPCSIZE/4];
 }FAT4K,FAT4Kp;
 
+/* fat目录项512 */
+typedef struct __FAT_DS_BLOCK{
+    FAT_DS fat[BLOCKSIZE/sizeof(FAT_DS)]
+}FAT_DS_BLOCK,*FAT_DS_BLOCKp;
+
+/* fat目录项4K */
+typedef struct __FAT_DS_BLOCK4K{
+    FAT_DS fat[SPCSIZE/sizeof(FAT_DS)]
+}FAT_DS_BLOCK4K,*FAT_DS_BLOCK4Kp;
 #pragma pack()
 
 

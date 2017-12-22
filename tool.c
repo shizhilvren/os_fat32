@@ -37,6 +37,17 @@ int do_read_block(FILE*fp,BLOCK* block,int offset,int num){
     }
 }
 
+u32 getNext(FileSystemInfop fsip,u32 num){
+    if(num/(512/4)>fsip->BPB_FATSz32){
+        return 0;
+    }
+    u32 cuNum=num/(512/4);
+    u32 index=num%(512/4);
+    FAT fat;
+    do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+    return fat.fat[index];
+}
+
 int newfree(FileSystemInfop fsip,u32 num){
     return SUCCESS;
 }
@@ -48,7 +59,7 @@ char* my_strcpy(char *to,const char*from,int size ){
     return to;
 }
 
-//È¡µÃ²ÎÊý 
+//È¡ï¿½Ã²ï¿½ï¿½ï¿½ 
 int getargv(ARGP argp){
     char cmd[ARGLEN*10];
     if(gets(cmd)==NULL){
@@ -83,7 +94,7 @@ int getargv(ARGP argp){
 }
 
 
-//×Ö·û´®×ª»»³ÉÕû ´íÎó·µ»ØINF
+//ï¿½Ö·ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ó·µ»ï¿½INF
 int ctoi(const char* ch){
     int ret=0;
     for(u32 i=0;i<strlen(ch);i++){
