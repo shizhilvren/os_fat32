@@ -4,10 +4,10 @@
 #include<ctype.h>
 
 int nameCheck(const char name[ARGLEN]){
-    if(strlen(name)>11||strlen(name)<=0){
+    if(strlen(name)>8||strlen(name)<=0){
         return ERROR;
     }
-    for(int i=0;i<11;i++){
+    for(int i=0;i<8;i++){
         if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
                  name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
                   name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
@@ -25,7 +25,7 @@ int my_mkdir(const ARGP arg,FileSystemInfop fileSystemInfop){
 功能        创建文件夹\n\
 语法格式    mkdir name\n\
 name       创建文件夹的名字\n\
-备注       文件名强制转为大写，文件名最长不超过11位\n";
+备注       文件名强制转为大写，文件名最长不超过8位\n";
     char name[ARGLEN];
     FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
@@ -66,6 +66,7 @@ name       创建文件夹的名字\n\
     u32 pathNum=fileSystemInfop->pathNum;
     u32 cut;
     while(TRUE){
+        //检查这一页的目录项
         do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
         for(cut=0;cut<SPCSIZE/32;cut++){
             char lin[12];
@@ -80,6 +81,7 @@ name       创建文件夹的名字\n\
                 return ERROR;
             }
         }
+        //取得下一个目录项
         if(cut==SPCSIZE/32){
             u32 lin=pathNum;
             pathNum=getNext(fileSystemInfop,pathNum);
