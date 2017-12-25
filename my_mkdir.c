@@ -4,10 +4,10 @@
 #include<ctype.h>
 
 int nameCheck(const char name[ARGLEN]){
-    if(strlen(name)>8||strlen(name)<=0){
+    if(strlen(name)>11||strlen(name)<=0){
         return ERROR;
     }
-    for(int i=0;i<8;i++){
+    for(int i=0;i<11;i++){
         if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
                  name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
                   name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
