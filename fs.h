@@ -196,14 +196,14 @@ typedef struct __FAT_DS_BLOCK4K{
 #pragma pack()
 
 
-#define __DEBUG__
+// #define __DEBUG__
 #ifdef __DEBUG__
     #define DEBUG printf
-#elif
-    #define DEBUG debug
-    void debug(char *,...){
-        return;
-    }
+#endif
+#ifndef __DEBUG__
+    int debug_in(char * format,...);
+    #define DEBUG debug_in
+    
 #endif //__DEBUG__
 
 //全局错误结构体

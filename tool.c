@@ -134,3 +134,7 @@ int ctoi(const char* ch){
     }
     return ret;
 }
+
+int debug_in(char * format,...){
+    return 0;
+}
