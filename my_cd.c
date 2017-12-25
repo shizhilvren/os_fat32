@@ -24,14 +24,14 @@ name       进入文件夹的名字\n\
     			printf(helpstr);
     			return SUCCESS;
     		}else{
-    			DEBUG("hear\n");
+    			//DEBUG("hear\n");
     			memset(name,' ',12);
     			my_strcpy(name,arg->argv[0],strlen(arg->argv[0]));
     			name[11]='\0';
     			for(int i=0;i<11;i++){
     				name[i]=toupper(name[i]);
     			}
-    			DEBUG("%s|\n",name);
+    			//DEBUG("%s|\n",name);
 				break;
     		} 
     	case 0:
@@ -58,17 +58,17 @@ name       进入文件夹的名字\n\
 //			if(fat_ds.fat[cut].DIR_Attr==0){//是什么特殊的属性吗 
 //   				break;
 //			}else 
-			DEBUG("in1%s|\n",lin);
-			DEBUG("in2%s|\n",name);
+		//	DEBUG("in1%s|\n",lin);
+			//DEBUG("in2%s|\n",name);
 			if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY) 
 					&& strcmp(name,lin)==0 ){//前半部分什么意思，介绍下read的具体步骤 
 				fileSystemInfop->pathNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16)
 																	| (u32)fat_ds.fat[cut].DIR_FstClusLO );
-				DEBUG("%u\n",fileSystemInfop->pathNum);
-				DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusHI);
-				DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusLO);
+				//DEBUG("%u\n",fileSystemInfop->pathNum);
+				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusHI);
+				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusLO);
 				strcat(fileSystemInfop->path,lin);
-				printf("陈宫\n");
+				printf("成功\n");
 				return SUCCESS;	    	
 			}else{
 				continue;
