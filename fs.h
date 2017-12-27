@@ -109,8 +109,7 @@ typedef struct __FAT_DS{
     u16 DIR_WriTime;
     u16 DIR_WrtDate;
     u16 DIR_FstClusLO;
-    u16 DIR_FileSize;
-    char cover[2];
+    u32 DIR_FileSize;
 }FAT_DS,*FAT_DSp;
 
 typedef struct __MBR_in{
