@@ -35,6 +35,16 @@ typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 
+
+#define __DEBUG__
+#ifdef __DEBUG__
+    #define DEBUG printf
+#endif
+#ifndef __DEBUG__
+    int debug_in(char * format,...);
+    #define DEBUG debug_in
+    
+#endif //__DEBUG__
 //文件系统基本信息 重要
 /*
     常用数据 
@@ -194,17 +204,6 @@ typedef struct __FAT_DS_BLOCK4K{
     FAT_DS fat[SPCSIZE/sizeof(FAT_DS)];
 }FAT_DS_BLOCK4K,*FAT_DS_BLOCK4Kp;
 #pragma pack()
-
-
-// #define __DEBUG__
-#ifdef __DEBUG__
-    #define DEBUG printf
-#endif
-#ifndef __DEBUG__
-    int debug_in(char * format,...);
-    #define DEBUG debug_in
-    
-#endif //__DEBUG__
 
 //全局错误结构体
 typedef struct __ERROR{

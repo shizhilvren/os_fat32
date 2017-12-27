@@ -3,11 +3,16 @@
 #include<memory.h>
 #include<ctype.h>
 
-int nameCheck(const char name[ARGLEN]){
-    if(strlen(name)>11||strlen(name)<=0){
+int nameCheckChange(const char name[ARGLEN],char name38[12]){
+    if(strlen(name)>12||strlen(name)<=0){
         return ERROR;
     }
-    for(int i=0;i<11;i++){
+    int point=-1;
+    for(u32 i=0;i<strlen(name);i++){
+        if(name[i]=='.'){
+            point=i;
+            continue;
+        }
         if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
                  name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
                   name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
@@ -16,16 +21,36 @@ int nameCheck(const char name[ARGLEN]){
             return ERROR;
         }
     }
-    return SUCCESS;
+    if( ((point!=-1) && (point<=8 && strlen(name)-point-1<=3 )) 
+                || (point==-1 && strlen(name)<=8 )){
+        memset(name38,' ',11);
+        name38[11]='\0';
+        if(point==0){
+            return ERROR;
+        }else if(point!=-1){
+            for(int i=0;i<point;i++){
+                name38[i]=name[i];
+            }
+            for(int i=point+1;i<(int)strlen(name);i++){
+                name38[i-point+8-1]=name[i];
+            }
+        }else{
+            for(int i=0;i<(int)strlen(name);i++){
+                name38[i]=name[i];
+            }
+        }
+        return SUCCESS;
+    }
+    return ERROR;;
 }
 
-int my_mkdir(const ARGP arg,FileSystemInfop fileSystemInfop){
+int my_create(const ARGP arg,FileSystemInfop fileSystemInfop){
     const char helpstr[]=
 "\
-功能        创建文件夹\n\
-语法格式    mkdir name\n\
+功能        创建文件\n\
+语法格式    create name\n\
 name       创建文件夹的名字\n\
-备注       文件名强制转为大写，文件名最长不超过8位\n";
+备注       文件名强制转为大写，文件名要符合三八命名方式\n";
     char name[ARGLEN];
     FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
@@ -42,7 +67,7 @@ name       创建文件夹的名字\n\
                 memset(name,' ',ARGLEN);
                 my_strcpy(name,arg->argv[0],strlen(arg->argv[0]));
                 name[11]='\0';
-                if(nameCheck(name)==ERROR){
+                if(nameCheckChange(arg->argv[0],name)==ERROR){
                     strcpy(error.msg,"文件名过长或存在非法字符\n\x00");
                     printf("文件名过长或存在非法字符\n");
                     return ERROR;
@@ -96,25 +121,9 @@ name       创建文件夹的名字\n\
             }
         }else{
             //找到了空的
-            //取得. 与..
-            u32 pathnumd=newfree(fileSystemInfop,0);
-            FAT_DS_BLOCK4K fat_ds_d;
-            memset(&fat_ds_d,0,SPCSIZE);
-            my_strcpy(fat_ds_d.fat[0].name,".           ",11);
-            my_strcpy(fat_ds_d.fat[1].name,"..          ",11);
-            fat_ds_d.fat[0].DIR_Attr=ATTR_DIRECTORY;
-            fat_ds_d.fat[1].DIR_Attr=ATTR_DIRECTORY;
-            fat_ds_d.fat[0].DIR_FstClusHI=(u16)(pathnumd>>16);
-            fat_ds_d.fat[0].DIR_FstClusLO=(u16)(pathnumd&0x0000ffff);
-            fat_ds_d.fat[1].DIR_FstClusHI=(u16)(pathNum>>16);
-            fat_ds_d.fat[1].DIR_FstClusLO=(u16)(pathNum&0x0000ffff);
-            do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds_d,L2R(fileSystemInfop,pathnumd));
-            
             memset(&fat_ds.fat[cut],0,sizeof(FAT_DS));
             my_strcpy(fat_ds.fat[cut].name,name,11);
-            fat_ds.fat[cut].DIR_FstClusHI=(u16)(pathnumd>>16);
-            fat_ds.fat[cut].DIR_FstClusLO=(u16)(pathnumd&0x0000ffff);
-            fat_ds.fat[cut].DIR_Attr=ATTR_DIRECTORY;
+            fat_ds.fat[cut].DIR_Attr=ATTR_ARCHIVE;
             
             //写入新建文件
             do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));

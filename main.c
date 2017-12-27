@@ -28,6 +28,8 @@ int main(){
             my_mkdir(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"cd")==0){
             my_cd(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"create")==0){
+            my_create(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
             flag=my_exitsys(&argv,&fileSysInfo);
             if(flag==SUCCESS){
