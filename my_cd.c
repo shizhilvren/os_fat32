@@ -69,9 +69,9 @@ name       进入文件夹的名字\n\
 				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusHI);
 				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusLO);
 				//路径字符串修改
-				if(strcmp(lin,".          ")==0){
+				if(strcmp(lin,DIR_d)==0){
 
-				}else if (strcmp(lin,"..         ")==0){
+				}else if (strcmp(lin,DIR_dd)==0){
 					for(int i=strlen(fileSystemInfop->path)-1;i>=0;i--){
 						if(fileSystemInfop->path[i]=='/'){
 							fileSystemInfop->path[i]=0x00;

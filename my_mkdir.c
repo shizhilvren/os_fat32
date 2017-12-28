@@ -100,8 +100,8 @@ name       创建文件夹的名字\n\
             u32 pathnumd=newfree(fileSystemInfop,0);
             FAT_DS_BLOCK4K fat_ds_d;
             memset(&fat_ds_d,0,SPCSIZE);
-            my_strcpy(fat_ds_d.fat[0].name,".           ",11);
-            my_strcpy(fat_ds_d.fat[1].name,"..          ",11);
+            my_strcpy(fat_ds_d.fat[0].name,DIR_d,11);
+            my_strcpy(fat_ds_d.fat[1].name,DIR_dd,11);
             fat_ds_d.fat[0].DIR_Attr=ATTR_DIRECTORY;
             fat_ds_d.fat[1].DIR_Attr=ATTR_DIRECTORY;
             fat_ds_d.fat[0].DIR_FstClusHI=(u16)(pathnumd>>16);

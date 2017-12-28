@@ -57,7 +57,6 @@ name	  想要删除的文件名\n";
 				//被删除的
 				continue;
 			}
-			//判断是否是目录，是目录再判断是否空目录
 			DEBUG("|%s|\n|%s|\n",delname,name);
 			if( (fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE) && strcmp(delname,name)==0 ){
 				delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );

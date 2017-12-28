@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<ctype.h>
 
 int do_write_block4k(FILE*fp,BLOCK4K* block4k,int offset){
     if(offset==-1){
@@ -143,6 +144,47 @@ int ctoi(const char* ch){
         }
     }
     return ret;
+}
+
+int nameCheckChange(const char name[ARGLEN],char name38[12]){
+    if(strlen(name)>12||strlen(name)<=0){
+        return ERROR;
+    }
+    int point=-1;
+    for(u32 i=0;i<strlen(name);i++){
+        if(name[i]=='.'){
+            point=i;
+            continue;
+        }
+        if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
+                 name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
+                  name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
+                  name[i]=='!' || name[i]=='(' || name[i]==')' || name[i]=='{' || 
+                  name[i]=='}' || name[i]=='^' || name[i]=='#' || name[i]=='&')){
+            return ERROR;
+        }
+    }
+    if( ((point!=-1) && (point<=8 && strlen(name)-point-1<=3 )) 
+                || (point==-1 && strlen(name)<=8 )){
+        memset(name38,' ',11);
+        name38[11]='\0';
+        if(point==0){
+            return ERROR;
+        }else if(point!=-1){
+            for(int i=0;i<point;i++){
+                name38[i]=name[i];
+            }
+            for(int i=point+1;i<(int)strlen(name);i++){
+                name38[i-point+8-1]=name[i];
+            }
+        }else{
+            for(int i=0;i<(int)strlen(name);i++){
+                name38[i]=name[i];
+            }
+        }
+        return SUCCESS;
+    }
+    return ERROR;;
 }
 
 int debug_in(char * format,...){

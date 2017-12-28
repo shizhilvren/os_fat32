@@ -53,7 +53,8 @@ int delfree(FileSystemInfop fsip,u32 num);
 
 /* 取得num簇的下一簇 返回下一簇编号 出错返回0*/
 u32 getNext(FileSystemInfop fsip,u32 num);
-
+/* 把输入的文件名转换为83明明格式的文件名 若文件名合法则返回SUCCESS否则返回ERROR */
+int nameCheckChange(const char name[ARGLEN],char name38[12]);
 //与系统的区别不检查\0x00
 char* my_strcpy(char *to,const char*from,int size );
 #endif 
