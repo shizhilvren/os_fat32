@@ -67,6 +67,10 @@ name	  想要删除的文件夹名\n";
                 }
                 delname[11]='\0';
 				DEBUG("|%s|\n",delname);
+                if(strcmp(arg->argv[0],"..")==0||strcmp(arg->argv[0],".")==0){
+                    printf("文件夹不存在\n");
+	                return SUCCESS;
+                }
 				break;
 			}
 		case 0:
