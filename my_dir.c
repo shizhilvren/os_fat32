@@ -46,6 +46,10 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop){
 			char lin[12];
 			my_strcpy(lin,fat_ds.fat[cut].name,11);
 			lin[11]='\0';
+			if(fat_ds.fat[cut].name[0]=='\xe5'){
+				//±»É¾³ýµÄ
+				continue;
+			}
             if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY)){
                 //Ä¿Â¼
                 attr++;

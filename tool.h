@@ -48,7 +48,7 @@ int do_read_block(FILE*fp,BLOCK* block,int offset,int num);
     若 num=0则不连接否则标记num下一块为新取得的
 */
 u32 newfree(FileSystemInfop fsip,u32 num);
-//释放一个已用簇 num簇号
+//释放一个已用簇 num簇号返回被删除的下一块
 int delfree(FileSystemInfop fsip,u32 num);
 
 /* 取得num簇的下一簇 返回下一簇编号 出错返回0*/

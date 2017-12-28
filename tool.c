@@ -78,6 +78,16 @@ int newfree(FileSystemInfop fsip,u32 num){
     }
     return 0;
 }
+int delfree(FileSystemInfop fsip,u32 num){
+    FAT fat;
+    u32 cuNum=num/(512/4);
+    u32 index=num%(512/4);
+    do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+    u32 ret=fat.fat[index];
+    fat.fat[index]=FAT_FREE;
+    do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+    return ret;
+}
 
 char* my_strcpy(char *to,const char*from,int size ){
     for(int i=0;i<size;i++){
