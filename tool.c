@@ -67,11 +67,15 @@ int newfree(FileSystemInfop fsip,u32 num){
         for(int j=0;j<512/4;j++){
             if(fat.fat[j]==FAT_FREE){
                 fat.fat[j]=FAT_END;
-                do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+i)/8,(fsip->FAT[0]+i)%8);
+                for(int i=0;i<fsip->BPB_NumFATs;i++){
+                    do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[i]+i)/8,(fsip->FAT[i]+i)%8);
+                }
                 if(num!=0){
                     do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
                     fat.fat[index]=i*(512/4)+j;
-                    do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+                    for(int i=0;i<fsip->BPB_NumFATs;i++){
+                        do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[i]+cuNum)/8,(fsip->FAT[i]+cuNum)%8);
+                    }
                 }
                 return i*(512/4)+j;
             }
@@ -86,7 +90,9 @@ int delfree(FileSystemInfop fsip,u32 num){
     do_read_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
     u32 ret=fat.fat[index];
     fat.fat[index]=FAT_FREE;
-    do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[0]+cuNum)/8,(fsip->FAT[0]+cuNum)%8);
+    for(int i=0;i<fsip->BPB_NumFATs;i++){
+        do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[i]+cuNum)/8,(fsip->FAT[i]+cuNum)%8);
+    }
     return ret;
 }
 
