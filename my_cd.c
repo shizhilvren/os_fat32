@@ -62,13 +62,35 @@ name       进入文件夹的名字\n\
 			//DEBUG("in2%s|\n",name);
 			if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY) 
 					&& strcmp(name,lin)==0 ){//前半部分什么意思，介绍下read的具体步骤 
+				//路径快修改
 				fileSystemInfop->pathNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16)
 																	| (u32)fat_ds.fat[cut].DIR_FstClusLO );
 				//DEBUG("%u\n",fileSystemInfop->pathNum);
 				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusHI);
 				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusLO);
-				strcat(fileSystemInfop->path,lin);
-				printf("成功\n");
+				//路径字符串修改
+				if(strcmp(lin,".          ")==0){
+
+				}else if (strcmp(lin,"..         ")==0){
+					for(int i=strlen(fileSystemInfop->path)-1;i>=0;i--){
+						if(fileSystemInfop->path[i]=='/'){
+							fileSystemInfop->path[i]=0x00;
+							break;
+						}
+					}
+				}else{
+					strcat(fileSystemInfop->path,"/");
+					strcat(fileSystemInfop->path,lin);
+					for(int i=strlen(fileSystemInfop->path)-1;i>=0;i--){
+						if(fileSystemInfop->path[i]==' '){
+							fileSystemInfop->path[i]=0x00;
+						}else{
+							break;
+						}
+					}
+				}
+				
+				// printf("成功\n");
 				return SUCCESS;	    	
 			}else{
 				continue;
