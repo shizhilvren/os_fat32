@@ -53,13 +53,6 @@ name	  想要删除的文件名\n";
 			char name[12];
 			my_strcpy(name,fat_ds.fat[cut].name,11);
 			name[11]='\0';
-			if(name==delname && !(fat_ds.fat[cut].DIR_Att&ATTR_DIRECTORY)){
-				delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
-				delfileNum=delfree(fileSystemInfop,delfileNum);
-				memset(&fat_ds.fat[cut],32);
-				do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
-				return SUCCESS;
-			}
 			if(fat_ds.fat[cut].name[0]=='\xe5'){
 				//被删除的
 				continue;
