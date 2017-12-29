@@ -45,13 +45,27 @@ typedef unsigned char u8;
     int debug_in(char * format,...);
     #define DEBUG debug_in
     
-#endif //__DEBUG__
+#endif//__DEBUG__
+
+
+typedef struct _OPENDFILE{
+    //是否有效，为Ture有效
+    int flag;
+    //目录簇号
+    u32 Dir_Clus;
+    //文件簇号
+    u32 File_Clus;
+    //文件名字
+    char File_name[12];
+}Opendfile,*Opendfilep;
+
 //文件系统基本信息 重要
 /*
     常用数据 
     以下数据涉及的扇区号都从绝对磁盘簇起
     若为定义扇区数则默认为该簇第0扇
 */
+
 typedef struct __FileSystemInfo{
     /*  结构体是否有效TRUE 或FALSE */
     u32 flag;       
@@ -94,22 +108,12 @@ typedef struct __FileSystemInfo{
     /* 保留区引导扇所占扇区数 通常为6 */
     u16 BPB_BkBootSec;
     //打开的文件信息
-    Opendfile Openf[10];
+    Opendfile Opendf[10];
 
 }FileSystemInfo,*FileSystemInfop;
 
 #pragma pack(1)
 
-typedef struct _OPENDFILE{
-    //是否有效，为1 有效
-    int flag;
-    //目录簇号
-    u32 Dir_Clus;
-    //文件簇号
-    u32 File_Clus;
-    //文件名字
-    char File_name[12];
-}Opendfile,*Opendfile;
 
 typedef struct __FAT_DS{
     char name[8];
