@@ -97,6 +97,16 @@ typedef struct __FileSystemInfo{
 }FileSystemInfo,*FileSystemInfop;
 
 #pragma pack(1)
+
+typedef struct _OPENDFILE{
+    //目录簇号
+    u32 Dir_Clus;
+    //文件簇号
+    u32 File_Clus;
+    //文件名字
+    char File_name[12];
+}Opendfile,*Opendfile;
+
 typedef struct __FAT_DS{
     char name[8];
     char named[3];
