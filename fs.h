@@ -29,7 +29,8 @@
 #define FAT_END     0x0fffffff
 #define FAT_BAD     0x0ffffff7
 #define FAT_FREE    0x0
-
+#define DIR_d  ".          "
+#define DIR_dd "..         "
 typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned short u16;
@@ -250,7 +251,6 @@ typedef struct __hd_ftr {
   char   reserved[426];   /* padding                                      */ 
 }HD_FTR,*HD_FTRp; 
 
-
 void startsys();    
 
 /*成功返回SUCCESS 失败返回ERROR*/
@@ -265,7 +265,9 @@ int my_cd(const ARGP arg,FileSystemInfop fileSystemInfop);
 int my_mkdir(const ARGP arg,FileSystemInfop fileSystemInfop);
 int my_rmdir(const ARGP arg,FileSystemInfop fileSystemInfop);
 int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop);
+/* 创建一个文件但不分配磁盘块 */
 int my_create(const ARGP arg,FileSystemInfop fileSystemInfop);
+/* 移除一个文件并释放磁盘块 */
 int my_rm(const ARGP arg,FileSystemInfop fileSystemInfop);
 
 int my_open();

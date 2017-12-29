@@ -8,9 +8,9 @@ int my_rm(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char delname[12];
 	const char helpstr[]=
 "\
-功能		删除文件或空目录\n\
+功能		删除文件\n\
 格式		rm name\n\
-name		name of the file want to delete\n  ";
+name	  想要删除的文件名\n";
 
 	if(fileSystemInfop->flag==FALSE){
 		strcpy(error.msg,"未指定文件系统\n\x00");
@@ -20,10 +20,19 @@ name		name of the file want to delete\n  ";
 
 	switch(arg->len){
 		case 1:
-			memset(delname,' ',12);
-			my_strcpy(delname,arg->argv[0],strlen(arg->argv[0]));
-			delname[11]='\0';
+			if(strcmp(arg->argv[0],"/?")==0){
+                printf(helpstr);
+                return SUCCESS;
+            }else{
+				memset(delname,' ',12);
+				my_strcpy(delname,arg->argv[0],strlen(arg->argv[0]));
+				for(u32 i=0;i<strlen(arg->argv[0]);i++){
+					delname[i]=toupper(delname[i]);
+				}
+				delname[11]='\0';
+				DEBUG("|%s|\n",delname);
 				break;
+			}
 		case 0:
 			DEBUG("未输入文件名\n");
 			return SUCCESS;
@@ -44,27 +53,26 @@ name		name of the file want to delete\n  ";
 			char name[12];
 			my_strcpy(name,fat_ds.fat[cut].name,11);
 			name[11]='\0';
-			//判断是否是目录，是目录再判断是否空目录
-			if( strcmp(delname,name)==0 ){
-				if( !( fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY )){
-
+			if(name==delname && !(fat_ds.fat[cut].DIR_Att&ATTR_DIRECTORY)){
+				delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
+				delfileNum=delfree(fileSystemInfop,delfileNum);
+				memset(&fat_ds.fat[cut],32);
+				do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
+				return SUCCESS;
+			}
+			if(fat_ds.fat[cut].name[0]=='\xe5'){
+				//被删除的
+				continue;
+			}
+			DEBUG("|%s|\n|%s|\n",delname,name);
+			if( (fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE) && strcmp(delname,name)==0 ){
+				delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
+				while(delfileNum!=FAT_END && delfileNum!=FAT_FREE){
+					delfileNum=delfree(fileSystemInfop,delfileNum);
 				}
-				else{
-					if(fat_ds.fat[cut].DIR_FileSize==32){
-						//删除空目录
-					}
-					else{
-						
-						strcpy(error.msg,"目录非空\n\x00");
-						printf("目录非空\n");
-						return SUCCESS
-					}
-				}
-				delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16)
-																	| (u32)fat_ds.fat[cut].DIR_FstClusLO );
-
-				printf("成功\n");
-				return SUCCESS;	    	
+				fat_ds.fat[cut].name[0]='\xe5';
+				do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
+				return SUCCESS;    	
 			}else{
 				continue;
 			}

@@ -32,6 +32,10 @@ int main(){
             my_create(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"dir")==0||strcmp(cmd,"ls")==0){
             my_dir(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"rm")==0){
+            my_rm(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"rmdir")==0){
+            my_rmdir(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
             flag=my_exitsys(&argv,&fileSysInfo);
             if(flag==SUCCESS){

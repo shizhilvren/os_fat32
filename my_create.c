@@ -3,47 +3,6 @@
 #include<memory.h>
 #include<ctype.h>
 
-int nameCheckChange(const char name[ARGLEN],char name38[12]){
-    if(strlen(name)>12||strlen(name)<=0){
-        return ERROR;
-    }
-    int point=-1;
-    for(u32 i=0;i<strlen(name);i++){
-        if(name[i]=='.'){
-            point=i;
-            continue;
-        }
-        if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
-                 name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
-                  name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
-                  name[i]=='!' || name[i]=='(' || name[i]==')' || name[i]=='{' || 
-                  name[i]=='}' || name[i]=='^' || name[i]=='#' || name[i]=='&')){
-            return ERROR;
-        }
-    }
-    if( ((point!=-1) && (point<=8 && strlen(name)-point-1<=3 )) 
-                || (point==-1 && strlen(name)<=8 )){
-        memset(name38,' ',11);
-        name38[11]='\0';
-        if(point==0){
-            return ERROR;
-        }else if(point!=-1){
-            for(int i=0;i<point;i++){
-                name38[i]=name[i];
-            }
-            for(int i=point+1;i<(int)strlen(name);i++){
-                name38[i-point+8-1]=name[i];
-            }
-        }else{
-            for(int i=0;i<(int)strlen(name);i++){
-                name38[i]=name[i];
-            }
-        }
-        return SUCCESS;
-    }
-    return ERROR;;
-}
-
 int my_create(const ARGP arg,FileSystemInfop fileSystemInfop){
     const char helpstr[]=
 "\
@@ -64,9 +23,6 @@ name       创建文件夹的名字\n\
                 printf(helpstr);
                 return SUCCESS;
             }else{
-                memset(name,' ',ARGLEN);
-                my_strcpy(name,arg->argv[0],strlen(arg->argv[0]));
-                name[11]='\0';
                 if(nameCheckChange(arg->argv[0],name)==ERROR){
                     strcpy(error.msg,"文件名过长或存在非法字符\n\x00");
                     printf("文件名过长或存在非法字符\n");
@@ -97,7 +53,7 @@ name       创建文件夹的名字\n\
             char lin[12];
             my_strcpy(lin,fat_ds.fat[cut].name,11);
             lin[11]='\0';
-            if(fat_ds.fat[cut].DIR_Attr==0){
+            if(fat_ds.fat[cut].name[0]=='\xE5' || fat_ds.fat[cut].name[0]=='\x00'){
                 break;
             }else if((fat_ds.fat[cut].DIR_Attr) && 
                             strcmp(name,lin)==0 ){
