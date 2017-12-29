@@ -31,6 +31,7 @@
 #define FAT_FREE    0x0
 #define DIR_d  ".          "
 #define DIR_dd "..         "
+#define OPENFILESIZE    10
 typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned short u16;
@@ -108,7 +109,7 @@ typedef struct __FileSystemInfo{
     /* 保留区引导扇所占扇区数 通常为6 */
     u16 BPB_BkBootSec;
     //打开的文件信息
-    Opendfile Opendf[10];
+    Opendfile Opendf[OPENFILESIZE];
 
 }FileSystemInfo,*FileSystemInfop;
 

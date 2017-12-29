@@ -36,6 +36,11 @@ int main(){
             my_rm(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"rmdir")==0){
             my_rmdir(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"open")==0){
+            my_open(&argv,&fileSysInfo);
+            DEBUG("open\n");
+        }else if(strcmp(cmd,"close")==0){
+            my_close(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
             flag=my_exitsys(&argv,&fileSysInfo);
             if(flag==SUCCESS){

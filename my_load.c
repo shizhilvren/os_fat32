@@ -42,6 +42,7 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
         printf("文件打开量错误\n");
         return ERROR;
     }
+    memset(fileSystemInfop,0,sizeof(FileSystemInfo));
     fileSystemInfop->flag=TRUE;
     fileSystemInfop->fp=fp;
     strcpy(fileSystemInfop->fileName,fileName);
@@ -75,7 +76,13 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
         fileSystemInfop->FAT[i]=start+i*fileSystemInfop->BPB_FATSz32;
     }
     fileSystemInfop->pathNum=fileSystemInfop->BPB_RootClis;
-    
+    /* 初始化打开文件目录 */
+    for(int i=0;i<OPENFILESIZE;i++){
+        fileSystemInfop->Opendf[i].flag=FALSE;
+        memset(fileSystemInfop->Opendf[i].File_name,' ',11);
+    }
+
+
     DEBUG("%s 加载成功!\n",fileSystemInfop->fileName);
     DEBUG("根目录簇号 %d\n",fileSystemInfop->rootNum);
     DEBUG("簇 %d %d\n",fileSystemInfop->FAT[0],fileSystemInfop->FAT[1]);
