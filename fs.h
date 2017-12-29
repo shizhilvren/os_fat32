@@ -92,7 +92,9 @@ typedef struct __FileSystemInfo{
     /* 根本目录所在第一扇区数  逻辑*/
     u32 BPB_RootClis;   
     /* 保留区引导扇所占扇区数 通常为6 */
-    u16 BPB_BkBootSec;  
+    u16 BPB_BkBootSec;
+    //打开的文件信息
+    Opendfile Openf[10];
 
 }FileSystemInfo,*FileSystemInfop;
 
