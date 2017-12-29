@@ -101,6 +101,8 @@ typedef struct __FileSystemInfo{
 #pragma pack(1)
 
 typedef struct _OPENDFILE{
+    //是否有效，为1 有效
+    int flag;
     //目录簇号
     u32 Dir_Clus;
     //文件簇号
