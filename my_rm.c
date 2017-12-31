@@ -3,18 +3,18 @@
 #include"tool.h"
 #include<memory.h>
 #include<ctype.h>
-//æš‚æ—¶è®¾å®šä¸ºåªèƒ½åˆ é™¤å½“å‰ç›®å½•ä¸‹çš„æ–‡ä»¶,ä¸åŒ…å«éç©ºç›®å½•
+//ÔİÊ±Éè¶¨ÎªÖ»ÄÜÉ¾³ıµ±Ç°Ä¿Â¼ÏÂµÄÎÄ¼ş,²»°üº¬·Ç¿ÕÄ¿Â¼
 int my_rm(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char delname[12];
 	const char helpstr[]=
 "\
-åŠŸèƒ½		åˆ é™¤æ–‡ä»¶\n\
-æ ¼å¼		rm name\n\
-name	  æƒ³è¦åˆ é™¤çš„æ–‡ä»¶å\n";
+¹¦ÄÜ		É¾³ıÎÄ¼ş\n\
+¸ñÊ½		rm name\n\
+name	  ÏëÒªÉ¾³ıµÄÎÄ¼şÃû\n";
 
 	if(fileSystemInfop->flag==FALSE){
-		strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
-		printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
+		strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
+		printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
 		return ERROR;
 	}
 
@@ -34,12 +34,12 @@ name	  æƒ³è¦åˆ é™¤çš„æ–‡ä»¶å\n";
 				break;
 			}
 		case 0:
-			DEBUG("æœªè¾“å…¥æ–‡ä»¶å\n");
+			DEBUG("Î´ÊäÈëÎÄ¼şÃû\n");
 			return SUCCESS;
 		default:
 		error:;
-			strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
-			printf("å‚æ•°æ•°é‡é”™è¯¯\n");
+			strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
+			printf("²ÎÊıÊıÁ¿´íÎó\n");
 			return ERROR;
 	}
 	u32 pathNum=fileSystemInfop->pathNum;
@@ -54,7 +54,7 @@ name	  æƒ³è¦åˆ é™¤çš„æ–‡ä»¶å\n";
 			my_strcpy(name,fat_ds.fat[cut].name,11);
 			name[11]='\0';
 			if(fat_ds.fat[cut].name[0]=='\xe5'){
-				//è¢«åˆ é™¤çš„
+				//±»É¾³ıµÄ
 				continue;
 			}
 			DEBUG("|%s|\n|%s|\n",delname,name);
@@ -72,6 +72,6 @@ name	  æƒ³è¦åˆ é™¤çš„æ–‡ä»¶å\n";
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-	printf("æ–‡ä»¶ä¸å­˜åœ¨\n");
+	printf("ÎÄ¼ş²»´æÔÚ\n");
 	return SUCCESS;
 }

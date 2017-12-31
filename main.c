@@ -41,6 +41,8 @@ int main(){
             DEBUG("open\n");
         }else if(strcmp(cmd,"close")==0){
             my_close(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"write")==0){
+            my_write(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
             flag=my_exitsys(&argv,&fileSysInfo);
             if(flag==SUCCESS){

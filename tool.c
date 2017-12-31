@@ -77,6 +77,9 @@ int newfree(FileSystemInfop fsip,u32 num){
                         do_write_block(fsip->fp,(BLOCK*)&fat,(fsip->FAT[i]+cuNum)/8,(fsip->FAT[i]+cuNum)%8);
                     }
                 }
+                BLOCK4K block4k;
+                memset(&block4k,0,SPCSIZE);
+                do_write_block4k(fsip->fp,&block4k,L2R(fsip,i*(512/4)+j));
                 return i*(512/4)+j;
             }
         }

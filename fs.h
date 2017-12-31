@@ -15,6 +15,15 @@
 #define SPCSIZE     4096
 #define K           1024
 
+/* 截断写 */
+#define TRUNCATION  0 
+/* 追加写 */
+#define ADDITIONAL  1
+/* 覆盖写 */
+#define COVER       2
+
+
+
 #define ATTR_READ_ONLY  0x01
 #define ATTR_HIDDEN     0x02
 #define ATTR_SYSTEM     0x04
@@ -52,9 +61,15 @@ typedef unsigned char u8;
 typedef struct _OPENDFILE{
     //是否有效，为Ture有效
     int flag;
+    /* 读指针位置 */
+    u32 readp;
+    /* 写指针位置 */
+    u32 writep;
     //目录簇号
     u32 Dir_Clus;
-    //文件簇号
+    /* 文件结构项位置编号 */
+    u32 numID;
+    //文件簇号起始
     u32 File_Clus;
     //文件名字
     char File_name[12];
@@ -288,11 +303,30 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop);
 int my_create(const ARGP arg,FileSystemInfop fileSystemInfop);
 /* 移除一个文件并释放磁盘块 */
 int my_rm(const ARGP arg,FileSystemInfop fileSystemInfop);
+/* 用户与程序使用的文件打开 */
+int my_open(const ARGP arg,FileSystemInfop fileSystemInfop);
+/* 用户使用的文件关闭 */
+int my_close(const ARGP arg,FileSystemInfop fileSystemInfop);
+/* 用户使用的文件写 */
+int my_write(const ARGP arg,FileSystemInfop fileSystemInfop);
+/*  程序使用的文件度*/
+int my_read(const ARGP arg,FileSystemInfop fileSystemInfop);
 
-int my_open();
-int my_close();
-int my_write();
-int my_read();
-
-
+/* 程序用关闭 fnum为文件描述符 */
+int close_in(int fnum,FileSystemInfop fileSystemInfop);
+/* 程序用度函数 */
+int read_in(int fnum,int start,int len,void *buf,FileSystemInfop fileSystemInfop);
+/* 
+    程序用写函数 正确返回写入长度错误返回负数
+    特别规定
+    type
+        0截断写把文件清零不限制读写长度
+        1追加写在后面添加内容
+        2覆盖写原文件长度不变（不可增加）
+    返回值 -1 文件描述符非法
+    返回值 -2 文件操作类型非法
+*/
+int write_in(int fnum,int type,int size,void* buf,FileSystemInfop fileSystemInfop);
+/* 真正的写函数 */
+int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemInfop);
 #endif //__FS__

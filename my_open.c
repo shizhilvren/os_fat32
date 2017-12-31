@@ -3,7 +3,6 @@
 #include"tool.h"
 #include<memory.h>
 #include<ctype.h>
-
 int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char name[12]; 
 	const char helpstr[]=
@@ -61,7 +60,7 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
             	} 
             	else{
             		fileclus = (u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
-            		for(int i =0;i<10;i++){
+            		for(int i =0;i<OPENFILESIZE;i++){
             			//只能打开一次文件
             			opendf = &(fileSystemInfop->Opendf[i]);
             			if(opendf->flag == TRUE){
@@ -74,8 +73,11 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
             				opendf->flag = TRUE;
             				opendf->Dir_Clus = pathNum;
             				opendf->File_Clus = fileclus;
+							opendf->readp = 0;
+							opendf->writep = 0;
+							opendf->numID = cut;
             				strcpy(opendf->File_name,name);
-	            			printf("%s\n","打开文件成功");
+	            			printf("%s%d\n","打开文件成功 文件描述符是",i);
 	            			return SUCCESS;
             			}
             		}

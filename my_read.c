@@ -39,15 +39,15 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
     Opendfilep opendf;
 
     // for(int i=0;i<OPENFILESIZE;i++){
-		// int num=ctoi(arg->argv[0]);
-		// if(num>=0&&num<OPENFILESIZE){
-		// 	opendf = &(fileSystemInfop->Opendf[num]);
-		// 	if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)){
-		// 		opendf->flag=FALSE;
-		// 		return SUCCESS;
-		// 	}
-		// }
-		// printf("文件未打开\n");
+		int num=ctoi(arg->argv[0]);
+		if(num>=0&&num<OPENFILESIZE){
+			opendf = &(fileSystemInfop->Opendf[num]);
+			if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)){
+				opendf->flag=FALSE;
+				return SUCCESS;
+			}
+		}
+		printf("文件未打开\n");
     // }
     return SUCCESS;
 
