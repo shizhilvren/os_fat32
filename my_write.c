@@ -73,7 +73,7 @@ type        写入模式0截断 1追加 2覆盖\n";
                 for(int i=0;i<OPENFILESIZE;i++){
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
-                        int num=0;
+                         int num=0;
                         char buf[ARGLEN*10];
                         printf("以EOF结束\n");
                         while(scanf("%c",&buf[num])!=EOF){
@@ -112,10 +112,11 @@ int write_in(int fnum,int type,int size,void* buf,FileSystemInfop fileSystemInfo
         case TRUNCATION:
             if(fat_ds.fat[opendf->numID].DIR_FileSize!=0){
                 lin=(u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
-                while(lin!=FAT_END||lin!=FAT_SAVE||lin!=FAT_FREE){
+                while(lin!=FAT_END&&lin!=FAT_SAVE&&lin!=FAT_FREE){
                     lin=delfree(fileSystemInfop,lin);
                 }
                 fat_ds.fat[opendf->numID].DIR_FileSize=0;
+                do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,opendf->Dir_Clus));
             }
             return write_real(fnum,0,size,buf,fileSystemInfop);
             break;
@@ -166,6 +167,7 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         fat_ds.fat[opendf->numID].DIR_FstClusHI=(u16)(fileclus>>16);
         fat_ds.fat[opendf->numID].DIR_FstClusLO=(u16)(fileclus&0x0000ffff);
         fat_ds.fat[opendf->numID].DIR_FileSize=SPCSIZE;
+        opendf->File_Clus=fileclus;
         flagZero=TRUE;
     }
     while(SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE))<start){

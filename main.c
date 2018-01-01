@@ -43,6 +43,8 @@ int main(){
             my_close(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"write")==0){
             my_write(&argv,&fileSysInfo);
+        }else if(strcmp(cmd,"read")==0){
+            my_read(&argv,&fileSysInfo);
         }else if(strcmp(cmd,"exit")==0){
             flag=my_exitsys(&argv,&fileSysInfo);
             if(flag==SUCCESS){
