@@ -3,52 +3,81 @@
 #include"tool.h"
 #include<memory.h>
 #include<ctype.h>
+//读取文件最大长度为4098字节
+#define MAXLEN 4098
 
-int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
-	const char helpstr[]=
-"\
-功能        关闭当前目录的某个文件\n\
-语法格式    close name\n\
-		   \n";
- 	// FAT_DS_BLOCK4K fat_ds;
-    if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"未指定文件系统\n\x00");
-        printf("未指定文件系统\n");
-        return ERROR;
-    }
-    switch(arg->len){
-    	case 1:
-    		if(strcmp(arg->argv[0],"/?")==0){
-    			printf(helpstr);
-    			return SUCCESS;
-    		}else{
-				DEBUG("|%s|\n",arg->argv[0]);
-				break;
-    		} 
-    	case 0:
-    		break;
-    	default:
-    	error:;
-            strcpy(error.msg,"参数数量错误\n\x00");
-            printf("参数数量错误\n");
-            return ERROR;
-    }
-    
-    
-	u32 pathNum=fileSystemInfop->pathNum;
-    Opendfilep opendf;
+int do_read(int fd,int len,char *text){
 
-    // for(int i=0;i<OPENFILESIZE;i++){
-		int num=ctoi(arg->argv[0]);
-		if(num>=0&&num<OPENFILESIZE){
-			opendf = &(fileSystemInfop->Opendf[num]);
-			if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)){
-				opendf->flag=FALSE;
-				return SUCCESS;
+	char buffer[1024];
+	Opendfilep opendf = &(fileSystemInfop->Opendf[fd]);
+	u32 pathNum=opendf->Dir_Clus;
+	int offset = L2R(fileSystemInfop,pathNum)
+	int num = 0;
+	int readBytes = 0;
+	int remainBytes = len;
+
+	do{
+
+		if(remainBytes<1024){
+			fseek(fp,offset*SPCSIZE+num*BLOCKSIZE,SEEK_SET);
+			fread(buffer,1,remainBytes,fp);
+			for(int i=0;i<remainBytes;i++){
+				text[readBytes] = buffer[i];
 			}
+			readBytes += readBytes;
+			remainBytes = 0;
+			break;
+		}else{
+
+			fseek(fp,offset*SPCSIZE+num*BLOCKSIZE,SEEK_SET);
+			fread(buffer,sizeof(buffer),1,fp);
+			for(int i=0;i<sizeof(buffer);i++){
+				text[readBytes] = buffer[i];
+			}
+			remainBytes -= sizeof(buffer);//sizeof(buffer)理论上应为1024
+			readBytes += sizeof(buffer);
 		}
-		printf("文件未打开\n");
-    // }
-    return SUCCESS;
+		//4098 = 1024 * 4
+		num += 1;
+		if( num ==4 )num=0;
+		//最大读取限制
+		if(readBytes>((MAXLEN/1024)-1)*1024)break;
+
+		pathNum=getNext(fileSystemInfop,pathNum);
+		
+	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
+
+	return readBytes;
+
+}
+
+int my_read(int fd,int len,FileSystemInfop fileSystemInfop){
+
+	char text[MAXLEN];
+	int readBytes;
+	Opendfilep opendf;
+	
+	if( fd >9 || fd < 0 ){
+		printf("%s\n","文件描述符不合法");
+		return ERROR;
+	}
+	opendf = &(fileSystemInfop->Opendf[fd]);
+
+	if( opendf->flag == FALSE ){
+		printf("%s\n","给定文件描述符无效");
+		return ERROR;
+	}else{
+		u32 pathNum=opendf->Dir_Clus;
+		FAT_DS_BLOCK4K fat_ds;
+		readBytes = do_read(fd,len,text);
+		//text[readBytes] = '\0';
+		//将结果输出到屏幕
+		for(int i=0;text[i]!='\0';i++){
+			printf("%s",text[i]);
+		}
+
+	}
+
+
 
 }
