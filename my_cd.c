@@ -72,14 +72,19 @@ name       进入文件夹的名字\n\
 				if(strcmp(lin,DIR_d)==0){
 
 				}else if (strcmp(lin,DIR_dd)==0){
+					int lin=0;
 					for(int i=strlen(fileSystemInfop->path)-1;i>=0;i--){
 						if(fileSystemInfop->path[i]=='/'){
-							fileSystemInfop->path[i]=0x00;
-							break;
+							lin++;
+							// fileSystemInfop->path[i]=0x00;
+							if(lin==2){
+								fileSystemInfop->path[i+1]=0x00;
+								break;
+							}
+							
 						}
 					}
 				}else{
-					strcat(fileSystemInfop->path,"/");
 					strcat(fileSystemInfop->path,lin);
 					for(int i=strlen(fileSystemInfop->path)-1;i>=0;i--){
 						if(fileSystemInfop->path[i]==' '){
@@ -88,6 +93,8 @@ name       进入文件夹的名字\n\
 							break;
 						}
 					}
+					strcat(fileSystemInfop->path,"/");
+					fileSystemInfop->path[strlen(fileSystemInfop->path)]='\x0';
 				}
 				
 				// printf("成功\n");

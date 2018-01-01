@@ -22,12 +22,15 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
     			printf(helpstr);
     			return SUCCESS;
     		}else{
-    			memset(name,' ',12);
-				my_strcpy(name,arg->argv[0],strlen(arg->argv[0]));
-				for(u32 i=0;i<strlen(arg->argv[0]);i++){
-					name[i]=toupper(name[i]);
-				}
-				name[11]='\0';
+				if(nameCheckChange(arg->argv[0],name)==ERROR){
+                    strcpy(error.msg,"文件名过长或存在非法字符\n\x00");
+                    printf("文件名过长或存在非法字符\n");
+                    return ERROR;
+                }
+                for(int i=0;i<11;i++){
+                    name[i]=toupper(name[i]);
+                }
+                name[11]='\0';
 				DEBUG("|%s|\n",name);
 				break;
     		} 

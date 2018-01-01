@@ -40,7 +40,11 @@ type        写入模式0截断 1追加 2覆盖\n\
             name[11]='\0';
             DEBUG("|%s|\n",name);
             type=ctoi(arg->argv[1]);
-            if(type==INF){
+            if(type==2){
+                if(arg->len!=3){
+                    goto error;
+                }
+            }else if(type==INF){
                 strcpy(error.msg,"写入模式非法\n\x00");
                 printf("写入模式非法\n");
                 return ERROR; 
@@ -83,10 +87,13 @@ type        写入模式0截断 1追加 2覆盖\n\
                          int num=0;
                         char buf[ARGLEN*10];
                         printf("以EOF结束\n");
-                        while(scanf("%c",&buf[num])!=EOF){
+                        while(scanf("%c",&buf[num])!=EOF && buf[num]!=26){
                             num++;
                         }
-                        write_in(i,type,num,(void*)buf,fileSystemInfop);
+                        for(int i=0;i<num;i++){
+                            DEBUG("%d|",buf[i]);
+                        }
+                        write_in(i,type,offset,num,(void*)buf,fileSystemInfop);
                         return SUCCESS;
                     }
                 }
@@ -103,7 +110,7 @@ type        写入模式0截断 1追加 2覆盖\n\
     return SUCCESS;
 }
 
-int write_in(int fnum,int type,int size,void* buf,FileSystemInfop fileSystemInfop){
+int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop){
     if(fnum<0&&fnum>=OPENFILESIZE){
         return -1;
     }
@@ -134,6 +141,7 @@ int write_in(int fnum,int type,int size,void* buf,FileSystemInfop fileSystemInfo
             return write_real(fnum,lin,size,buf,fileSystemInfop);
             break;
         case COVER:
+            lin=start;
             if(lin+size>fat_ds.fat[opendf->numID].DIR_FileSize){
                 size=fat_ds.fat[opendf->numID].DIR_FileSize-lin;
             }

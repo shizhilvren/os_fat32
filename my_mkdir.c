@@ -3,11 +3,11 @@
 #include<memory.h>
 #include<ctype.h>
 
-int nameCheck(const char name[ARGLEN]){
+int nameCheck(char name[ARGLEN]){
     if(strlen(name)>11||strlen(name)<=0){
         return ERROR;
     }
-    for(int i=0;i<11;i++){
+    for(int i=0;i<strlen(name);i++){
         if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
                  name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
                   name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 
@@ -16,6 +16,10 @@ int nameCheck(const char name[ARGLEN]){
             return ERROR;
         }
     }
+    for(int i=strlen(name);i<11;i++){
+        name[i]=' ';
+    }
+    name[11]='\x0';
     return SUCCESS;
 }
 
@@ -39,9 +43,9 @@ name       创建文件夹的名字\n\
                 printf(helpstr);
                 return SUCCESS;
             }else{
-                memset(name,' ',ARGLEN);
-                my_strcpy(name,arg->argv[0],strlen(arg->argv[0]));
-                name[11]='\0';
+                // memset(name,' ',ARGLEN);
+                strcpy(name,arg->argv[0]);
+                // name[11]='\0';
                 if(nameCheck(name)==ERROR){
                     strcpy(error.msg,"文件名过长或存在非法字符\n\x00");
                     printf("文件名过长或存在非法字符\n");

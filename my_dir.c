@@ -53,7 +53,7 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop){
             if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY)){
                 //д©б╪
                 attr++;
-                printf("%6s %10s %8.8s %3.3\n",
+                printf("%6s %10s %8.8s%3.3s\n",
                     "<DIR>","",fat_ds.fat[cut].name,fat_ds.fat[cut].named);
             }else if((fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE)){ 
                 //нд╪Ч
