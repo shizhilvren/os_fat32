@@ -9,18 +9,25 @@ int my_write(const ARGP arg,FileSystemInfop fileSystemInfop){
 	const char helpstr[]=
 "\
 功能        写入当前目录下的某个文件，以文件尾为结束\n\
-语法格式    close name type\n\
+语法格式    close name type [offset]\n\
 name        写入文件名\n\
-type        写入模式0截断 1追加 2覆盖\n";
+type        写入模式0截断 1追加 2覆盖\n\
+若是覆盖写则offset有效，为覆盖的起始位置";
  	// FAT_DS_BLOCK4K fat_ds;
     char name[12];
     int type=-1;
+    u32 offset=0;
     if(fileSystemInfop->flag==FALSE){
         strcpy(error.msg,"未指定文件系统\n\x00");
         printf("未指定文件系统\n");
         return ERROR;
     }
     switch(arg->len){
+        case 3:
+            offset=ctoi(arg->argv[1]);
+            if(offset==INF){
+                goto error;
+            }
     	case 2:
             if(nameCheckChange(arg->argv[0],name)==ERROR){
                 strcpy(error.msg,"文件名过长或存在非法字符\n\x00");
@@ -107,7 +114,7 @@ int write_in(int fnum,int type,int size,void* buf,FileSystemInfop fileSystemInfo
         return 0;
     }
     do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,opendf->Dir_Clus));
-    int lin;
+    u32 lin;
     switch(type){
         case TRUNCATION:
             if(fat_ds.fat[opendf->numID].DIR_FileSize!=0){
@@ -116,12 +123,14 @@ int write_in(int fnum,int type,int size,void* buf,FileSystemInfop fileSystemInfo
                     lin=delfree(fileSystemInfop,lin);
                 }
                 fat_ds.fat[opendf->numID].DIR_FileSize=0;
+                fat_ds.fat[opendf->numID].DIR_FstClusLO=0;
+                fat_ds.fat[opendf->numID].DIR_FstClusHI=0;
                 do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,opendf->Dir_Clus));
             }
             return write_real(fnum,0,size,buf,fileSystemInfop);
             break;
         case ADDITIONAL:
-            lin=(u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
+            lin=fat_ds.fat[opendf->numID].DIR_FileSize;
             return write_real(fnum,lin,size,buf,fileSystemInfop);
             break;
         case COVER:
