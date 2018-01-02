@@ -195,31 +195,39 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         opendf->File_Clus=fileclus;
         flagZero=TRUE;
     }
-    DEBUG("%d\n",SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE)));
-    /* 文件长度4k对其  并强制移动*/
-    int lin=fat_ds.fat[opendf->numID].DIR_FileSize;
-    if(lin%SPCSIZE!=0){
-        lin=(lin/SPCSIZE+1)*SPCSIZE;
-    }
-    if(lin<=start){
-        int lin=start;
-        if(lin%SPCSIZE!=0){
-            lin=(lin/SPCSIZE+1)*SPCSIZE;
-        }
-        for(int i=0;i<lin/SPCSIZE;i++){
-            int old=fileclus;
-            fileclus=getNext(fileSystemInfop,fileclus);
-            if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
-                fileclus=newfree(fileSystemInfop,old);
-            }
-        }
-    }
+    // DEBUG("%d\n",SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE)));
+    // /* 文件长度4k对其  并强制移动*/
+    // int lin=fat_ds.fat[opendf->numID].DIR_FileSize;
+    // if(lin%SPCSIZE!=0){
+    //     lin=(lin/SPCSIZE+1)*SPCSIZE;
+    // }
+    // if(lin<=start){
+    //     int lin=start;
+    //     if(lin%SPCSIZE!=0){
+    //         lin=(lin/SPCSIZE+1)*SPCSIZE;
+    //     }
+    //     for(int i=0;i<lin/SPCSIZE;i++){
+    //         int old=fileclus;
+    //         fileclus=getNext(fileSystemInfop,fileclus);
+    //         if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
+    //             fileclus=newfree(fileSystemInfop,old);
+    //         }
+    //     }
+    // }
     opendf->writep=start;
     BLOCK4K block4k;
     /* 寻找要写的磁盘块 */
     fileclus=(u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
     for(int i=0;i<opendf->writep/SPCSIZE;i++){
+        int old=fileclus;
         fileclus=getNext(fileSystemInfop,fileclus);
+        if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
+            flagZero=TRUE;
+            fileclus=newfree(fileSystemInfop,old);
+        }
+    }
+    if(fat_ds.fat[opendf->numID].DIR_FileSize<=start){
+        flagZero=TRUE;
     }
     if(flagZero==TRUE){
         fat_ds.fat[opendf->numID].DIR_FileSize=opendf->writep;
