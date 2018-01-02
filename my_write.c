@@ -132,7 +132,7 @@ int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop file
     u32 lin;
     switch(type){
         case TRUNCATION:
-            if(fat_ds.fat[opendf->numID].DIR_FileSize!=0){
+            if(fat_ds.fat[opendf->numID].DIR_FileSize!=0 && start==0){
                 lin=(u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
                 while(lin!=FAT_END&&lin!=FAT_SAVE&&lin!=FAT_FREE){
                     lin=delfree(fileSystemInfop,lin);
@@ -195,9 +195,24 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         opendf->File_Clus=fileclus;
         flagZero=TRUE;
     }
-    while(SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE))<start){
-        fileclus=newfree(fileSystemInfop,fileclus);
-        fat_ds.fat[opendf->numID].DIR_FileSize=SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE))+SPCSIZE;
+    DEBUG("%d\n",SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE)));
+    /* 文件长度4k对其  并强制移动*/
+    int lin=fat_ds.fat[opendf->numID].DIR_FileSize;
+    if(lin%SPCSIZE!=0){
+        lin=(lin/SPCSIZE+1)*SPCSIZE;
+    }
+    if(lin<=start){
+        int lin=start;
+        if(lin%SPCSIZE!=0){
+            lin=(lin/SPCSIZE+1)*SPCSIZE;
+        }
+        for(int i=0;i<lin/SPCSIZE;i++){
+            int old=fileclus;
+            fileclus=getNext(fileSystemInfop,fileclus);
+            if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
+                fileclus=newfree(fileSystemInfop,old);
+            }
+        }
     }
     opendf->writep=start;
     BLOCK4K block4k;
@@ -217,15 +232,15 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
     if(opendf->writep%SPCSIZE!=0){
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
+        /* 剩余空间比写入的空间大 */
         if(len-writelen<(SPCSIZE-(opendf->writep%SPCSIZE))){
-            lin=len;
-            my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&buf[writelen]),lin);
-            writelen=len;
+            lin=len-writelen;
         }else{
-            lin=(SPCSIZE-opendf->writep%SPCSIZE);
-            my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&buf[writelen]),lin);
-            writelen+=SPCSIZE;
+            /* 补齐 */
+            lin=(SPCSIZE-opendf->writep%SPCSIZE);           
         }
+        my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&buf[writelen]),lin);
+        writelen+=lin;
         
         do_write_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         opendf->writep+=lin;
@@ -262,5 +277,5 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         fileclus=getNext(fileSystemInfop,fileclus);
     }
     do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,opendf->Dir_Clus));
-    return size-len;
+    return writelen;
 }
