@@ -78,14 +78,17 @@ start		读取的开始位置 默认为0\n";
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
                         char buf[ARGLEN*10];
-						while(len>ARGLEN*10-1){
-							int lin=read_real(i,start,ARGLEN*10-1,(void*)buf,fileSystemInfop);
-							for(int i=0;i<lin;i++){
+						int readlen=0;
+						if(len==0){
+							len=fat_ds.fat[cut].DIR_FileSize;
+						}
+						while(len-readlen>ARGLEN*10-1){
+							readlen+=read_real(i,start+readlen,ARGLEN*10-1,(void*)buf,fileSystemInfop);
+							for(int i=0;i<ARGLEN*10-1;i++){
 								printf("%c",buf[i]);
 							}
-							len-=lin;
 						}
-						int lin=read_real(i,start,len,(void*)buf,fileSystemInfop);
+						int lin=read_real(i,start+readlen,len-readlen,(void*)buf,fileSystemInfop);
 						for(int i=0;i<lin;i++){
 							printf("%c",buf[i]);
 						}
@@ -114,9 +117,9 @@ int read_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemIn
 	if(start>fat_ds.fat[opendf->numID].DIR_FileSize){
 		return -1;
 	}
-	if(size==0){
-		size=fat_ds.fat[opendf->numID].DIR_FileSize;
-	}
+	// if(size==0){
+	// 	size=fat_ds.fat[opendf->numID].DIR_FileSize;
+	// }
 	if(start+size>fat_ds.fat[opendf->numID].DIR_FileSize){
 		size=fat_ds.fat[opendf->numID].DIR_FileSize-start;
 	}

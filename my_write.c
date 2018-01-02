@@ -91,11 +91,11 @@ type        写入模式0截断 1追加 2覆盖\n\
                         int writelen=0;
                         while(scanf("%c",&buf[num])!=EOF && buf[num]!=26){
                             num++;
-                            if(num==ARGLEN*10-1){
+                            if(num>=ARGLEN*10){
                                 first++;
-                                for(int i=0;i<num;i++){
-                                    DEBUG("%d|",buf[i]);
-                                }
+                                // for(int i=0;i<num;i++){
+                                //     DEBUG("%d|",buf[i]);
+                                // }
                                 writelen+=write_in(i,type,offset+writelen,num,(void*)buf,fileSystemInfop);
                                 num=0;
                             }
@@ -213,17 +213,20 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
     int len=size;
     int fileclusold;
     /* 4k写入补齐 */
+    int writelen=0;
     if(opendf->writep%SPCSIZE!=0){
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
-        if(len<(SPCSIZE-opendf->writep%SPCSIZE)){
+        if(len-writelen<(SPCSIZE-(opendf->writep%SPCSIZE))){
             lin=len;
-            len=0;
+            my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&buf[writelen]),lin);
+            writelen=len;
         }else{
             lin=(SPCSIZE-opendf->writep%SPCSIZE);
-            len-=lin;
+            my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&buf[writelen]),lin);
+            writelen+=SPCSIZE;
         }
-        my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)buf,lin);
+        
         do_write_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         opendf->writep+=lin;
         if(opendf->writep>fat_ds.fat[opendf->numID].DIR_FileSize){
@@ -232,21 +235,24 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         fileclusold=fileclus;
         fileclus=getNext(fileSystemInfop,fileclus);
     }
-    while(len!=0){
+    
+    while(len-writelen>0){
         /* 没写完但到了最后一块 */
         if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
             fileclus=newfree(fileSystemInfop,fileclusold);
         }
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
-        if(len<SPCSIZE){
-            lin=len;
-            len=0;
+        if(len-writelen<SPCSIZE){
+            lin=len-writelen;
+            my_strcpy((char*)(&(block4k.block[0])),(char*)(&buf[writelen]),lin);
+            writelen=len;
         }else{
             lin=SPCSIZE;
-            len-=lin;
+            my_strcpy((char*)(&(block4k.block[0])),(char*)(&buf[writelen]),lin);
+            writelen+=SPCSIZE;
         }
-        my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)buf,lin);
+        
         do_write_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         opendf->writep+=lin;
         if(opendf->writep>fat_ds.fat[opendf->numID].DIR_FileSize){
