@@ -87,13 +87,21 @@ type        写入模式0截断 1追加 2覆盖\n\
                          int num=0;
                         char buf[ARGLEN*10];
                         printf("以EOF结束\n");
+                        int first=0;
+                        int writelen=0;
                         while(scanf("%c",&buf[num])!=EOF && buf[num]!=26){
                             num++;
+                            if(num==ARGLEN*10-1){
+                                first++;
+                                for(int i=0;i<num;i++){
+                                    DEBUG("%d|",buf[i]);
+                                }
+                                writelen+=write_in(i,type,offset+writelen,num,(void*)buf,fileSystemInfop);
+                                num=0;
+                            }
                         }
-                        for(int i=0;i<num;i++){
-                            DEBUG("%d|",buf[i]);
-                        }
-                        write_in(i,type,offset,num,(void*)buf,fileSystemInfop);
+                        write_in(i,type,offset+writelen,num,(void*)buf,fileSystemInfop);
+                        
                         return SUCCESS;
                     }
                 }
@@ -134,7 +142,7 @@ int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop file
                 fat_ds.fat[opendf->numID].DIR_FstClusHI=0;
                 do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,opendf->Dir_Clus));
             }
-            return write_real(fnum,0,size,buf,fileSystemInfop);
+            return write_real(fnum,start,size,buf,fileSystemInfop);
             break;
         case ADDITIONAL:
             lin=fat_ds.fat[opendf->numID].DIR_FileSize;

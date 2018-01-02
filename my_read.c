@@ -78,8 +78,15 @@ start		读取的开始位置 默认为0\n";
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
                         char buf[ARGLEN*10];
-                        int lin=read_real(i,start,len,(void*)buf,fileSystemInfop);
-                        for(int i=0;i<lin;i++){
+						while(len>ARGLEN*10-1){
+							int lin=read_real(i,start,ARGLEN*10-1,(void*)buf,fileSystemInfop);
+							for(int i=0;i<lin;i++){
+								printf("%c",buf[i]);
+							}
+							len-=lin;
+						}
+						int lin=read_real(i,start,len,(void*)buf,fileSystemInfop);
+						for(int i=0;i<lin;i++){
 							printf("%c",buf[i]);
 						}
 						printf("\n");
