@@ -7,7 +7,7 @@ int nameCheck(char name[ARGLEN]){
     if(strlen(name)>11||strlen(name)<=0){
         return ERROR;
     }
-    for(int i=0;i<strlen(name);i++){
+    for(u32 i=0;i<strlen(name);i++){
         if(!(isalnum(name[i]) || isalpha(name[i]) || isspace(name[i]) ||
                  name[i]=='$' || name[i]=='%' || name[i]=='\'' || name[i]=='-' ||
                   name[i]=='_' || name[i]=='@' || name[i]=='~' || name[i]=='`' || 

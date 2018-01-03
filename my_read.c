@@ -96,6 +96,8 @@ start		读取的开始位置 默认为0\n";
 						return SUCCESS;
                     }
                 }
+				printf("文件未打开\n");
+				return SUCCESS;
 			}
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
@@ -104,7 +106,7 @@ start		读取的开始位置 默认为0\n";
 	return SUCCESS;
 }
 
-int read_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemInfop){
+int read_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop){
 	FAT_DS_BLOCK4K fat_ds;
 	BLOCK4K block4k;
     /* 文件描述符非法 */
@@ -127,7 +129,7 @@ int read_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemIn
 	int where=SPCSIZE;
 	u32 fileclus=opendf->File_Clus;
 	u32 fileclusold=0;
-	for(int i=0;i<start/SPCSIZE;i++){
+	for(u32 i=0;i<start/SPCSIZE;i++){
 		fileclus=getNext(fileSystemInfop,fileclus);
 		where+=SPCSIZE;
 	}
@@ -157,7 +159,7 @@ int read_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemIn
         }else{
             lin=SPCSIZE;
         }
-        my_strcpy((char*)(&buf[readlen]),((char*)(&block4k)),lin);
+        my_strcpy((char*)(&((char*)buf)[readlen]),((char*)(&block4k)),lin);
         readlen+=lin;
 		opendf->readp+=lin;
         fileclusold=fileclus;

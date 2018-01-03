@@ -9,10 +9,10 @@ int my_write(const ARGP arg,FileSystemInfop fileSystemInfop){
 	const char helpstr[]=
 "\
 功能        写入当前目录下的某个文件，以文件尾为结束\n\
-语法格式    close name type [offset]\n\
+语法格式    write name type [offset]\n\
 name        写入文件名\n\
 type        写入模式0截断 1追加 2覆盖\n\
-若是覆盖写则offset有效，为覆盖的起始位置";
+若是覆盖写则offset有效，为覆盖的起始位置\n";
  	// FAT_DS_BLOCK4K fat_ds;
     char name[12];
     int type=-1;
@@ -161,20 +161,15 @@ int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop file
     }
 }
 
-int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemInfop){
+int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop){
     FAT_DS_BLOCK4K fat_ds;
     /* 文件描述符非法 */
     if(fnum<0&&fnum>=OPENFILESIZE){
         return -1;
     }
     /* 起始位置非法 */
-    if(start<0){
-        return -2;
-    }
     /* 写入长度非法 */
-    if(size<0){
-        return -3;
-    }else if(size==0){
+    if(size==0){
         return 0;
     }
     Opendfilep opendf = &(fileSystemInfop->Opendf[fnum]);
@@ -218,7 +213,7 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
     BLOCK4K block4k;
     /* 寻找要写的磁盘块 */
     fileclus=(u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
-    for(int i=0;i<opendf->writep/SPCSIZE;i++){
+    for(u32 i=0;i<opendf->writep/SPCSIZE;i++){
         int old=fileclus;
         fileclus=getNext(fileSystemInfop,fileclus);
         if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
@@ -241,13 +236,13 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
         /* 剩余空间比写入的空间大 */
-        if(len-writelen<(SPCSIZE-(opendf->writep%SPCSIZE))){
+        if(len-writelen<(int)(SPCSIZE-(opendf->writep%SPCSIZE))){
             lin=len-writelen;
         }else{
             /* 补齐 */
             lin=(SPCSIZE-opendf->writep%SPCSIZE);           
         }
-        my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&buf[writelen]),lin);
+        my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&((char*)buf)[writelen]),lin);
         writelen+=lin;
         
         do_write_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
@@ -268,11 +263,11 @@ int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemI
         int lin;
         if(len-writelen<SPCSIZE){
             lin=len-writelen;
-            my_strcpy((char*)(&(block4k.block[0])),(char*)(&buf[writelen]),lin);
+            my_strcpy((char*)(&(block4k.block[0])),(char*)(&((char*)buf)[writelen]),lin);
             writelen=len;
         }else{
             lin=SPCSIZE;
-            my_strcpy((char*)(&(block4k.block[0])),(char*)(&buf[writelen]),lin);
+            my_strcpy((char*)(&(block4k.block[0])),(char*)(&((char*)buf)[writelen]),lin);
             writelen+=SPCSIZE;
         }
         

@@ -329,7 +329,7 @@ int read_in(int fnum,int start,int len,void *buf,FileSystemInfop fileSystemInfop
 */
 int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop);
 /* 真正的写函数 */
-int write_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemInfop);
+int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop);
 /* 真正读出函数  size=0位读出所有*/
-int read_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemInfop);
+int read_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop);
 #endif //__FS__
