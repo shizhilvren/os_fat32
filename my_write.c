@@ -24,7 +24,7 @@ type        写入模式0截断 1追加 2覆盖\n\
     }
     switch(arg->len){
         case 3:
-            offset=ctoi(arg->argv[1]);
+            offset=ctoi(arg->argv[2]);
             if(offset==INF){
                 goto error;
             }
@@ -48,6 +48,10 @@ type        写入模式0截断 1追加 2覆盖\n\
                 strcpy(error.msg,"写入模式非法\n\x00");
                 printf("写入模式非法\n");
                 return ERROR; 
+            }else{
+                if(arg->len!=2){
+                    goto error;
+                }
             }
             break;
     		
@@ -84,7 +88,11 @@ type        写入模式0截断 1追加 2覆盖\n\
                 for(int i=0;i<OPENFILESIZE;i++){
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
-                         int num=0;
+                        if(offset>fat_ds.fat[cut].DIR_FileSize){
+                            printf("覆盖位置非法\n");
+                            return SUCCESS;
+                        }
+                        int num=0;
                         char buf[ARGLEN*10];
                         printf("以EOF结束\n");
                         int first=0;
@@ -117,7 +125,6 @@ type        写入模式0截断 1追加 2覆盖\n\
 
     return SUCCESS;
 }
-
 int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop){
     if(fnum<0&&fnum>=OPENFILESIZE){
         return -1;

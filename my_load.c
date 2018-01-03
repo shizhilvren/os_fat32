@@ -81,7 +81,11 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
         fileSystemInfop->Opendf[i].flag=FALSE;
         memset(fileSystemInfop->Opendf[i].File_name,' ',11);
     }
-
+    if(bpb.end!=0xaa55){
+        printf("这不是一个合法的文件系统!\n");
+        fileSystemInfop->flag=FALSE;
+        return SUCCESS;
+    }
 
     DEBUG("%s 加载成功!\n",fileSystemInfop->fileName);
     DEBUG("根目录簇号 %d\n",fileSystemInfop->rootNum);

@@ -24,12 +24,15 @@ name	  想要删除的文件名\n";
                 printf(helpstr);
                 return SUCCESS;
             }else{
-				memset(delname,' ',12);
-				my_strcpy(delname,arg->argv[0],strlen(arg->argv[0]));
-				for(u32 i=0;i<strlen(arg->argv[0]);i++){
-					delname[i]=toupper(delname[i]);
-				}
-				delname[11]='\0';
+                if(nameCheckChange(arg->argv[0],delname)==ERROR){
+                    strcpy(error.msg,"文件名过长或存在非法字符\n\x00");
+                    printf("文件名过长或存在非法字符\n");
+                    return ERROR;
+                }
+                for(int i=0;i<11;i++){
+                    delname[i]=toupper(delname[i]);
+                }
+                delname[11]='\0';
 				DEBUG("|%s|\n",delname);
 				break;
 			}

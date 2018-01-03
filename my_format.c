@@ -139,6 +139,7 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n";
         printf("文件打开量错误\n");
         return ERROR;
     }
+
     //生成文件本体
     memset(&block4k,0,SPCSIZE);
     for(int i=0;i<cut;i++){
