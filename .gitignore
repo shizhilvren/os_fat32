@@ -1,3 +1,4 @@
 *.vhd
 *.py
+*.txt
 /.vscode/

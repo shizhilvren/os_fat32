@@ -82,9 +82,9 @@ start		读取的开始位置 默认为0\n";
 						if(len==0){
 							len=fat_ds.fat[cut].DIR_FileSize;
 						}
-						while(len-readlen>ARGLEN*10-1){
-							readlen+=read_real(i,start+readlen,ARGLEN*10-1,(void*)buf,fileSystemInfop);
-							for(int i=0;i<ARGLEN*10-1;i++){
+						while(len-readlen>ARGLEN*10){
+							readlen+=read_real(i,start+readlen,ARGLEN*10,(void*)buf,fileSystemInfop);
+							for(int i=0;i<ARGLEN*10;i++){
 								printf("%c",buf[i]);
 							}
 						}
@@ -127,44 +127,43 @@ int read_real(int fnum,int start,int size,void* buf,FileSystemInfop fileSystemIn
 	int where=SPCSIZE;
 	u32 fileclus=opendf->File_Clus;
 	u32 fileclusold=0;
-	if(where<start){
+	for(int i=0;i<start/SPCSIZE;i++){
 		fileclus=getNext(fileSystemInfop,fileclus);
 		where+=SPCSIZE;
 	}
 	u32 len=size;
 	opendf->readp=start;
     /* 4k读入入补齐 */
+	int readlen=0;
     if(opendf->readp%SPCSIZE!=0){
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
-        if(len<(SPCSIZE-opendf->readp%SPCSIZE)){
-            lin=len;
-            len=0;
+        if(len-readlen<(SPCSIZE-opendf->readp%SPCSIZE)){
+            lin=len-readlen;
         }else{
             lin=(SPCSIZE-opendf->readp%SPCSIZE);
-            len-=lin;
         }
+		readlen+=lin;
         my_strcpy((char*)buf,&(((char*)&block4k)[(opendf->readp%SPCSIZE)]),lin);
         opendf->readp+=lin;
         fileclusold=fileclus;
         fileclus=getNext(fileSystemInfop,fileclus);
     }
-	while(len!=0){
+	while(len-readlen>0){
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
-        if(len<SPCSIZE){
-            lin=len;
-            len=0;
+        if(len-readlen<SPCSIZE){
+            lin=len-readlen;
         }else{
             lin=SPCSIZE;
-            len-=lin;
         }
-        my_strcpy((char*)buf,&(((char*)&block4k)[(opendf->readp%SPCSIZE)]),lin);
-        opendf->readp+=lin;
+        my_strcpy((char*)(&buf[readlen]),((char*)(&block4k)),lin);
+        readlen+=lin;
+		opendf->readp+=lin;
         fileclusold=fileclus;
         fileclus=getNext(fileSystemInfop,fileclus);
     }
-	return size-len;
+	return readlen;
 
 }
 
