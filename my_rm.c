@@ -49,7 +49,7 @@ name	  想要删除的文件名\n";
 	u32 cut;
 	FAT_DS_BLOCK4K fat_ds;
 	u32 delfileNum;
-
+    Opendfilep opendf;
 	do{
 		do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
 		for(cut=0;cut<SPCSIZE/32;cut++){
@@ -62,6 +62,13 @@ name	  想要删除的文件名\n";
 			}
 			DEBUG("|%s|\n|%s|\n",delname,name);
 			if( (fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE) && strcmp(delname,name)==0 ){
+				for(int i=0;i<OPENFILESIZE;i++){
+					opendf = &(fileSystemInfop->Opendf[i]);
+					if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
+						printf("文件已打开不能删除\n");
+						return SUCCESS;
+					}
+				}
 				delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
 				while(delfileNum!=FAT_END && delfileNum!=FAT_FREE){
 					delfileNum=delfree(fileSystemInfop,delfileNum);

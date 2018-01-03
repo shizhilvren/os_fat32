@@ -57,7 +57,7 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
             
             if(strcmp(lin,name)==0){
             	if(fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY){
-            		printf("不能打开文件夹");
+            		printf("不能打开文件夹\n");
             		strcpy(error.msg,"不能打开文件夹\n\x00");
             		return SUCCESS;
             	} 

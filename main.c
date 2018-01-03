@@ -5,6 +5,7 @@
 const char WXML[]="无效命令\n";
 int main(){
     printf("欢迎使用文件系统\n");
+    my_help();
     char cmd[ARGLEN];
     ARG argv;
     FileSystemInfo fileSysInfo;
@@ -50,6 +51,8 @@ int main(){
             if(flag==SUCCESS){
                 break;
             }
+        }else if(strcmp(cmd,"help")==0){
+            my_help();
         }else{
             printf(WXML);
         }

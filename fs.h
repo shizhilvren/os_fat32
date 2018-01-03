@@ -47,7 +47,7 @@ typedef unsigned short u16;
 typedef unsigned char u8;
 
 
-#define __DEBUG__
+// #define __DEBUG__
 #ifdef __DEBUG__
     #define DEBUG printf
 #endif
@@ -285,7 +285,7 @@ typedef struct __hd_ftr {
   char   reserved[426];   /* padding                                      */ 
 }HD_FTR,*HD_FTRp; 
 
-void startsys();    
+int my_help();    
 
 /*成功返回SUCCESS 失败返回ERROR*/
 //命令行可调用
