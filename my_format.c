@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
+/* 存在随机根目录dir乱码 原因不明 */
 /*
     接受一个参数 不得小于256MB 不得大于2097152MB(2TB)
     默认一个磁盘块512B 一簇4KB 8个块
