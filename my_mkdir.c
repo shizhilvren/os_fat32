@@ -76,7 +76,10 @@ name       创建文件夹的名字\n\
             char lin[12];
             my_strcpy(lin,fat_ds.fat[cut].name,11);
             lin[11]='\0';
-            if(fat_ds.fat[cut].name[0]=='\xE5' || fat_ds.fat[cut].name[0]=='\x00'){
+            if(
+                // fat_ds.fat[cut].name[0]=='\xE5' 
+            // || 
+            fat_ds.fat[cut].name[0]=='\x00'){
                 break;
             }else if((fat_ds.fat[cut].DIR_Attr) && 
                             strcmp(name,lin)==0 ){
