@@ -108,6 +108,7 @@ type        写入模式0截断 1追加 2覆盖\n\
                                 num=0;
                             }
                         }
+                        clearerr(stdin);
                         write_in(i,type,offset+writelen,num,(void*)buf,fileSystemInfop);
                         
                         return SUCCESS;
