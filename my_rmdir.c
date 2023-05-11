@@ -13,7 +13,7 @@ int isEmpty(FileSystemInfop fileSystemInfop,u32 pathNum){
 		do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
 		for(cut=0;cut<SPCSIZE/32;cut++){
 			if(fat_ds.fat[cut].name[0]=='\xe5' || fat_ds.fat[cut].name[0]=='\x00'){
-				//±»É¾³ıµÄ Óë¿Õ
+				//è¢«åˆ é™¤çš„ ä¸ç©º
 				continue;
 			}else{
                 char name[12];
@@ -36,18 +36,18 @@ int isEmpty(FileSystemInfop fileSystemInfop,u32 pathNum){
 
 
 
-//ÔİÊ±Éè¶¨ÎªÖ»ÄÜÉ¾³ıµ±Ç°Ä¿Â¼ÏÂµÄÎÄ¼ş,²»°üº¬·Ç¿ÕÄ¿Â¼
+//æš‚æ—¶è®¾å®šä¸ºåªèƒ½åˆ é™¤å½“å‰ç›®å½•ä¸‹çš„æ–‡ä»¶,ä¸åŒ…å«éç©ºç›®å½•
 int my_rmdir(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char delname[12];
 	const char helpstr[]=
 "\
-¹¦ÄÜ		É¾³ıÎÄ¼ş¼Ğ\n\
-¸ñÊ½		rm name\n\
-name	  ÏëÒªÉ¾³ıµÄÎÄ¼ş¼ĞÃû\n";
+åŠŸèƒ½		åˆ é™¤æ–‡ä»¶å¤¹\n\
+æ ¼å¼		rm name\n\
+name	  æƒ³è¦åˆ é™¤çš„æ–‡ä»¶å¤¹å\n";
 
 	if(fileSystemInfop->flag==FALSE){
-		strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-		printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+		strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+		printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
 		return ERROR;
 	}
 
@@ -58,8 +58,8 @@ name	  ÏëÒªÉ¾³ıµÄÎÄ¼ş¼ĞÃû\n";
                 return SUCCESS;
             }else{
 				if(nameCheckChange(arg->argv[0],delname)==ERROR){
-                    strcpy(error.msg,"ÎÄ¼ş¼ĞÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n\x00");
-                    printf("ÎÄ¼ş¼ĞÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n");
+                    strcpy(error.msg,"æ–‡ä»¶å¤¹åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n\x00");
+                    printf("æ–‡ä»¶å¤¹åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n");
                     return ERROR;
                 }
                 for(int i=0;i<11;i++){
@@ -68,18 +68,18 @@ name	  ÏëÒªÉ¾³ıµÄÎÄ¼ş¼ĞÃû\n";
                 delname[11]='\0';
 				DEBUG("|%s|\n",delname);
                 if(strcmp(arg->argv[0],"..")==0||strcmp(arg->argv[0],".")==0){
-                    printf("ÎÄ¼ş¼Ğ²»´æÔÚ\n");
+                    printf("æ–‡ä»¶å¤¹ä¸å­˜åœ¨\n");
 	                return SUCCESS;
                 }
 				break;
 			}
 		case 0:
-			DEBUG("Î´ÊäÈëÎÄ¼şÃû\n");
+			DEBUG("æœªè¾“å…¥æ–‡ä»¶å\n");
 			return SUCCESS;
 		default:
 		error:;
-			strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-			printf("²ÎÊıÊıÁ¿´íÎó\n");
+			strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+			printf("å‚æ•°æ•°é‡é”™è¯¯\n");
 			return ERROR;
 	}
 	u32 pathNum=fileSystemInfop->pathNum;
@@ -94,17 +94,17 @@ name	  ÏëÒªÉ¾³ıµÄÎÄ¼ş¼ĞÃû\n";
 			my_strcpy(name,fat_ds.fat[cut].name,11);
 			name[11]='\0';
 			if(fat_ds.fat[cut].name[0]=='\xe5'){
-				//±»É¾³ıµÄ
+				//è¢«åˆ é™¤çš„
 				continue;
 			}
 			DEBUG("|%s|\n|%s|\n",delname,name);
 			if( (fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY) && strcmp(delname,name)==0 ){
-				//ÕÒµ½ÁËÒªÉ¾µÄÄ¿Â¼
+				//æ‰¾åˆ°äº†è¦åˆ çš„ç›®å½•
                 delfileNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
                 if(isEmpty(fileSystemInfop,delfileNum)==FALSE){
-                    //¿ÕÅĞ¶Ï
-                    strcpy(error.msg,"ÎÄ¼ş¼Ğ·Ç¿Õ\n\x00");
-                    printf("ÎÄ¼ş¼Ğ·Ç¿Õ\n");
+                    //ç©ºåˆ¤æ–­
+                    strcpy(error.msg,"æ–‡ä»¶å¤¹éç©º\n\x00");
+                    printf("æ–‡ä»¶å¤¹éç©º\n");
                     return ERROR;
                 }
                 while(delfileNum!=FAT_END && delfileNum!=FAT_FREE){
@@ -119,6 +119,6 @@ name	  ÏëÒªÉ¾³ıµÄÎÄ¼ş¼ĞÃû\n";
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-	printf("ÎÄ¼ş¼Ğ²»´æÔÚ\n");
+	printf("æ–‡ä»¶å¤¹ä¸å­˜åœ¨\n");
 	return SUCCESS;
 }

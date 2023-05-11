@@ -5,8 +5,8 @@
 int my_exitsys(const ARGP arg,FileSystemInfop fileSystemInfop){
     const char helpstr[]=
 "\
-功能        退出文件系统\n\
-语法格式    exit\n";
+鍔熻兘        閫�鍑烘枃浠剁郴缁焅n\
+璇硶鏍煎紡    exit\n";
 
     switch(arg->len){
         case 1:
@@ -20,8 +20,8 @@ int my_exitsys(const ARGP arg,FileSystemInfop fileSystemInfop){
             break;
         default:
         error:;
-            strcpy(error.msg,"参数数量错误\n\x00");
-            printf("参数数量错误\n");
+            strcpy(error.msg,"鍙傛暟鏁伴噺閿欒\n\x00");
+            printf("鍙傛暟鏁伴噺閿欒\n");
             return ERROR;
     }
     if(fileSystemInfop->flag){

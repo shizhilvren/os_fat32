@@ -8,14 +8,14 @@ int my_cd(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char name[12]; 
 	const char helpstr[]=
 "\
-¹¦ÄÜ        ½øÈëÎÄ¼ş¼Ğ\n\
-Óï·¨¸ñÊ½    cd name\n\
-name       ½øÈëÎÄ¼ş¼ĞµÄÃû×Ö\n\
-±¸×¢       ÎÄ¼şÃûÇ¿ÖÆ×ªÎª´óĞ´£¬ÎÄ¼şÃû×î³¤²»³¬¹ı8Î»\n";
+åŠŸèƒ½        è¿›å…¥æ–‡ä»¶å¤¹\n\
+è¯­æ³•æ ¼å¼    cd name\n\
+name       è¿›å…¥æ–‡ä»¶å¤¹çš„åå­—\n\
+å¤‡æ³¨       æ–‡ä»¶åå¼ºåˆ¶è½¬ä¸ºå¤§å†™ï¼Œæ–‡ä»¶åæœ€é•¿ä¸è¶…è¿‡8ä½\n";
  	FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-        printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+        strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+        printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
         return ERROR;
     }
     switch(arg->len){
@@ -35,12 +35,12 @@ name       ½øÈëÎÄ¼ş¼ĞµÄÃû×Ö\n\
 				break;
     		} 
     	case 0:
-    		DEBUG("Î´ÊäÈëÎÄ¼şÃû\n");
+    		DEBUG("æœªè¾“å…¥æ–‡ä»¶å\n");
     		return SUCCESS;
     	default:
     	error:;
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     
@@ -52,23 +52,23 @@ name       ½øÈëÎÄ¼ş¼ĞµÄÃû×Ö\n\
 		do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,pathNum));
 		for(cut=0;cut<SPCSIZE/32;cut++){
 			char lin[12];
-			my_strcpy(lin,fat_ds.fat[cut].name,11);//ÊÇ»ñÈ¡ÎÄ¼şµÄÃû³Æ£¿£¿£¿
+			my_strcpy(lin,fat_ds.fat[cut].name,11);//æ˜¯è·å–æ–‡ä»¶çš„åç§°ï¼Ÿï¼Ÿï¼Ÿ
 			lin[11]='\0';
 			
-//			if(fat_ds.fat[cut].DIR_Attr==0){//ÊÇÊ²Ã´ÌØÊâµÄÊôĞÔÂğ 
+//			if(fat_ds.fat[cut].DIR_Attr==0){//æ˜¯ä»€ä¹ˆç‰¹æ®Šçš„å±æ€§å— 
 //   				break;
 //			}else 
 		//	DEBUG("in1%s|\n",lin);
 			//DEBUG("in2%s|\n",name);
 			if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY) 
-					&& strcmp(name,lin)==0 ){//Ç°°ë²¿·ÖÊ²Ã´ÒâË¼£¬½éÉÜÏÂreadµÄ¾ßÌå²½Öè 
-				//Â·¾¶¿ìĞŞ¸Ä
+					&& strcmp(name,lin)==0 ){//å‰åŠéƒ¨åˆ†ä»€ä¹ˆæ„æ€ï¼Œä»‹ç»ä¸‹readçš„å…·ä½“æ­¥éª¤ 
+				//è·¯å¾„å¿«ä¿®æ”¹
 				fileSystemInfop->pathNum=(u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16)
 																	| (u32)fat_ds.fat[cut].DIR_FstClusLO );
 				//DEBUG("%u\n",fileSystemInfop->pathNum);
 				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusHI);
 				//DEBUG("%u\n",fat_ds.fat[cut].DIR_FstClusLO);
-				//Â·¾¶×Ö·û´®ĞŞ¸Ä
+				//è·¯å¾„å­—ç¬¦ä¸²ä¿®æ”¹
 				if(strcmp(lin,DIR_d)==0){
 
 				}else if (strcmp(lin,DIR_dd)==0){
@@ -97,7 +97,7 @@ name       ½øÈëÎÄ¼ş¼ĞµÄÃû×Ö\n\
 					fileSystemInfop->path[strlen(fileSystemInfop->path)]='\x0';
 				}
 				
-				// printf("³É¹¦\n");
+				// printf("æˆåŠŸ\n");
 				return SUCCESS;	    	
 			}else{
 				continue;
@@ -105,6 +105,6 @@ name       ½øÈëÎÄ¼ş¼ĞµÄÃû×Ö\n\
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-	printf("ÎÄ¼ş¼Ğ²»´æÔÚ\n");
+	printf("æ–‡ä»¶å¤¹ä¸å­˜åœ¨\n");
 	return SUCCESS;
 }

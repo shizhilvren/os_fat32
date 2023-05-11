@@ -1,19 +1,19 @@
 /*
-    й╣ож╟╢цШЁф╪стьпИдБ╢еел╡╒╫БнЖнд╪Чо╣мЁ
-    ╥╣╩ь╠ьр╙╡нйЩ
-    ╫сйэ пИдБ╢еелцШЁф
+    Е╝·Г▌╟Ф▄┴Е░█Г╖╟Е┼═Х╫╫Х≥ Ф▀÷Гё│Г⌡≤Е╧╤Х╖ёФ·░Ф√┤Д╩╤ГЁ╩Г╩÷
+    Х©■Е⌡·Е©┘Х╕│Е▐┌Ф∙╟
+    Ф▌╔Е▐≈ Х≥ Ф▀÷Гё│Г⌡≤Е░█Г╖╟
 */
 #include"fs.h"
 #include"tool.h"
 #include<string.h>
-//╢Р©╙нд╪Ч╣╚н╢╧ь╠у
+//Ф┴⌠Е╪─Ф√┤Д╩╤Д╫├Ф°╙Е┘ЁИ≈╜
 int my_load(const ARGP arg,FileSystemInfop fileSystemInfop){
     char fileName[ARGLEN]="fs.vhd";
     const char helpstr[]=
 "\
-╧╕дэ        ╪стьнд╪Чо╣мЁ\n\
-сО╥╗╦Яй╫    load [namefile]\n\
-namefile    пИдБ╢еелнд╪Чб╥╬╤ё╗╣╠г╟д©б╪об©╙й╪ё╘ д╛хо fs.vhd\n";
+Е┼÷Х┐╫        Е┼═Х╫╫Ф√┤Д╩╤ГЁ╩Г╩÷\n\
+Х╞╜ФЁ∙Ф═╪Е╪▐    load [namefile]\n\
+namefile    Х≥ Ф▀÷Гё│Г⌡≤Ф√┤Д╩╤Х╥╞Е╬└О╪┬Е╫⌠Е┴█Г⌡╝Е╫∙Д╦▀Е╪─Е╖▀О╪┴ И╩≤Х╝╓ fs.vhd\n";
     FILE *fp=NULL;
     MBR mbr;
     BS_BPB bpb;
@@ -31,15 +31,15 @@ namefile    пИдБ╢еелнд╪Чб╥╬╤ё╗╣╠г╟д©б╪об©╙й╪ё╘ д╛хо fs.vhd\n";
         case 0:
             break;
         default:
-            strcpy(error.msg,"╡нйЩйЩа©╢МнС\n\x00");
-            printf("╡нйЩйЩа©╢МнС\n");
+            strcpy(error.msg,"Е▐┌Ф∙╟Ф∙╟И┤▐И■≥Х╞╞\n\x00");
+            printf("Е▐┌Ф∙╟Ф∙╟И┤▐И■≥Х╞╞\n");
             return ERROR;
     }
 
     fp=fopen(fileName,"rb+");
     if(fp==NULL){
-        strcpy(error.msg,"нд╪Ч╢Р©╙╢МнС\n\x00");
-        printf("нд╪Ч╢Р©╙а©╢МнС\n");
+        strcpy(error.msg,"Ф√┤Д╩╤Ф┴⌠Е╪─И■≥Х╞╞\n\x00");
+        printf("Ф√┤Д╩╤Ф┴⌠Е╪─И┤▐И■≥Х╞╞\n");
         return ERROR;
     }
     memset(fileSystemInfop,0,sizeof(FileSystemInfo));
@@ -48,7 +48,7 @@ namefile    пИдБ╢еелнд╪Чб╥╬╤ё╗╣╠г╟д©б╪об©╙й╪ё╘ д╛хо fs.vhd\n";
     strcpy(fileSystemInfop->fileName,fileName);
     strcpy(fileSystemInfop->path,"/");
 
-    //MBR╡©╥ж
+    //MBRИ┐╗Е┬├
     do_read_block(fp,(BLOCK*)&mbr,0,0);
     fileSystemInfop->MBR_size=mbr.mbr_in[0].all;
     fileSystemInfop->MBR_start=mbr.mbr_in[0].strart_chan;
@@ -76,19 +76,19 @@ namefile    пИдБ╢еелнд╪Чб╥╬╤ё╗╣╠г╟д©б╪об©╙й╪ё╘ д╛хо fs.vhd\n";
         fileSystemInfop->FAT[i]=start+i*fileSystemInfop->BPB_FATSz32;
     }
     fileSystemInfop->pathNum=fileSystemInfop->BPB_RootClis;
-    /* ЁУй╪╩╞╢Р©╙нд╪Чд©б╪ */
+    /* Е┬²Е╖▀Е▄√Ф┴⌠Е╪─Ф√┤Д╩╤Г⌡╝Е╫∙ */
     for(int i=0;i<OPENFILESIZE;i++){
         fileSystemInfop->Opendf[i].flag=FALSE;
         memset(fileSystemInfop->Opendf[i].File_name,' ',11);
     }
     if(bpb.end!=0xaa55){
-        printf("уБ╡╩йгр╩╦Ж╨о╥╗╣днд╪Чо╣мЁ!\n");
+        printf("Х©≥Д╦█Ф≤╞Д╦─Д╦╙Е░┬ФЁ∙Г └Ф√┤Д╩╤ГЁ╩Г╩÷!\n");
         fileSystemInfop->flag=FALSE;
         return SUCCESS;
     }
 
-    DEBUG("%s ╪стьЁи╧╕!\n",fileSystemInfop->fileName);
-    DEBUG("╦Ыд©б╪╢ь╨е %d\n",fileSystemInfop->rootNum);
-    DEBUG("╢ь %d %d\n",fileSystemInfop->FAT[0],fileSystemInfop->FAT[1]);
+    DEBUG("%s Е┼═Х╫╫Ф┬░Е┼÷!\n",fileSystemInfop->fileName);
+    DEBUG("Ф═╧Г⌡╝Е╫∙Г╟┤Е▐╥ %d\n",fileSystemInfop->rootNum);
+    DEBUG("Г╟┤ %d %d\n",fileSystemInfop->FAT[0],fileSystemInfop->FAT[1]);
     return SUCCESS;
 }

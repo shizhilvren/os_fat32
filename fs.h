@@ -243,7 +243,7 @@ typedef struct __FAT_DS_BLOCK4K{
 typedef struct __ERROR{
     char msg[ARGLEN];
 }ERR;
-ERR error;
+extern ERR error;
 
 //块操纵员素
 typedef struct __BLOCK{

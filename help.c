@@ -1,21 +1,21 @@
 #include<stdio.h>
 #include"fs.h"
-const char help_str[]="文件系统\n\
-符合fat32标注文件可以作为虚拟磁盘挂载\n\
-命令      作用\n\
-format    格式化文件系统\n\
-load      加载文件系统\n\
-mkdir     创建文件夹\n\
-cd        进入文件夹\n\
-create    创建文件\n\
-dir       列出当前目录下文件\n\
-rm        移除文件\n\
-rmdir     移除空文件夹\n\
-open      打开文件\n\
-close     关闭文件\n\
-write     写文件\n\
-read      读文件\n\
-help      显示提示\n\
+const char help_str[]="鏂囦欢绯荤粺\n\
+绗﹀悎fat32鏍囨敞鏂囦欢鍙互浣滀负铏氭嫙纾佺洏鎸傝浇\n\
+鍛戒护      浣滅敤\n\
+format    鏍煎紡鍖栨枃浠剁郴缁焅n\
+load      鍔犺浇鏂囦欢绯荤粺\n\
+mkdir     鍒涘缓鏂囦欢澶筡n\
+cd        杩涘叆鏂囦欢澶筡n\
+create    鍒涘缓鏂囦欢\n\
+dir       鍒楀嚭褰撳墠鐩綍涓嬫枃浠禱n\
+rm        绉婚櫎鏂囦欢\n\
+rmdir     绉婚櫎绌烘枃浠跺す\n\
+open      鎵撳紑鏂囦欢\n\
+close     鍏抽棴鏂囦欢\n\
+write     鍐欐枃浠禱n\
+read      璇绘枃浠禱n\
+help      鏄剧ず鎻愮ず\n\
 \n";
 
 int my_help(){

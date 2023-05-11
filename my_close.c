@@ -8,13 +8,13 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char name[12];
 	const char helpstr[]=
 "\
-¹¦ÄÜ        ¹Ø±Õµ±Ç°Ä¿Â¼µÄÄ³¸öÎÄ¼ş\n\
-Óï·¨¸ñÊ½    close name\n\
+åŠŸèƒ½        å…³é—­å½“å‰ç›®å½•çš„æŸä¸ªæ–‡ä»¶\n\
+è¯­æ³•æ ¼å¼    close name\n\
 		   \n";
  	// FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-        printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+        strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+        printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
         return ERROR;
     }
     switch(arg->len){
@@ -24,8 +24,8 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
     			return SUCCESS;
     		}else{
 			if(nameCheckChange(arg->argv[0],name)==ERROR){
-                strcpy(error.msg,"ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n\x00");
-                printf("ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n");
+                strcpy(error.msg,"æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n\x00");
+                printf("æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n");
                 return ERROR;
             }
             for(int i=0;i<11;i++){
@@ -39,8 +39,8 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
     		break;
     	default:
     	error:;
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     
@@ -56,11 +56,11 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
 			my_strcpy(lin,fat_ds.fat[cut].name,11);
 			lin[11]='\0';
 			if(fat_ds.fat[cut].name[0]=='\xe5'){
-				//±»É¾³ıµÄ
+				//è¢«åˆ é™¤çš„
 				continue;
 			}
 			if((fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE)&&strcmp(lin,name)==0){ 
-                //ÎÄ¼ş
+                //æ–‡ä»¶
 				for(int i=0;i<OPENFILESIZE;i++){
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
@@ -68,7 +68,7 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
                         return SUCCESS;
                     }
                 }
-                printf("ÎÄ¼şÎ´´ò¿ª\n");
+                printf("æ–‡ä»¶æœªæ‰“å¼€\n");
                 return SUCCESS;
 			}
 		}
@@ -80,7 +80,7 @@ int my_close(const ARGP arg,FileSystemInfop fileSystemInfop){
 }
 
 int close_in(int fnum,FileSystemInfop fileSystemInfop){
-    /* ÎÄ¼şÃèÊö·û·Ç·¨ */
+    /* æ–‡ä»¶æè¿°ç¬¦éæ³• */
     if(fnum<0&&fnum>=OPENFILESIZE){
         return ERROR;
     }

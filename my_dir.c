@@ -8,13 +8,13 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char name[12]; 
 	const char helpstr[]=
 "\
-¹¦ÄÜ        ÏÔÊ¾µ±Ç°Ä¿Â¼µÄÎÄ¼şÎÄ¼ş¼Ğ\n\
-Óï·¨¸ñÊ½    dir\n\
+åŠŸèƒ½        æ˜¾ç¤ºå½“å‰ç›®å½•çš„æ–‡ä»¶æ–‡ä»¶å¤¹\n\
+è¯­æ³•æ ¼å¼    dir\n\
 		   ls\n";
  	FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-        printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+        strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+        printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
         return ERROR;
     }
     switch(arg->len){
@@ -29,8 +29,8 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop){
     		break;
     	default:
     	error:;
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     
@@ -47,16 +47,16 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop){
 			my_strcpy(lin,fat_ds.fat[cut].name,11);
 			lin[11]='\0';
 			if(fat_ds.fat[cut].name[0]=='\xe5'){
-				//±»É¾³ıµÄ
+				//è¢«åˆ é™¤çš„
 				continue;
 			}
             if((fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY)){
-                //Ä¿Â¼
+                //ç›®å½•
                 attr++;
                 printf("%6s %10s %8.8s%3.3s\n",
                     "<DIR>","",fat_ds.fat[cut].name,fat_ds.fat[cut].named);
             }else if((fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE)){ 
-                //ÎÄ¼ş
+                //æ–‡ä»¶
                 filesize+=fat_ds.fat[cut].DIR_FileSize;
                 file++;
 				char lin[4];
@@ -75,7 +75,7 @@ int my_dir(const ARGP arg,FileSystemInfop fileSystemInfop){
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-    printf("%10d¸öÎÄ¼ş   %10d×Ö½Ú\n",file,filesize);
-    printf("%10d¸öÎÄ¼ş¼Ğ\n",attr);
+    printf("%10dä¸ªæ–‡ä»¶   %10då­—èŠ‚\n",file,filesize);
+    printf("%10dä¸ªæ–‡ä»¶å¤¹\n",attr);
 	return SUCCESS;
 }

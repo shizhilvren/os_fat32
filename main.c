@@ -2,15 +2,15 @@
 #include"tool.h"
 #include<stdio.h>
 #include<stdlib.h>
-const char WXML[]="无效命令\n";
+const char WXML[]="鏃犳晥鍛戒护\n";
 int main(){
-    printf("欢迎使用文件系统\n");
+    printf("娆㈣繋浣跨敤鏂囦欢绯荤粺\n");
     my_help();
     char cmd[ARGLEN];
     ARG argv;
     FileSystemInfo fileSysInfo;
     fileSysInfo.flag=FALSE;
-    int flag;//执行状态标志位
+    int flag;//鎵ц鐘舵�佹爣蹇椾綅
     while(TRUE){
         if(fileSysInfo.flag){
             printf("%s > ",fileSysInfo.path);

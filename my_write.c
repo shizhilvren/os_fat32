@@ -8,18 +8,18 @@
 int my_write(const ARGP arg,FileSystemInfop fileSystemInfop){
 	const char helpstr[]=
 "\
-¹¦ÄÜ        Ğ´Èëµ±Ç°Ä¿Â¼ÏÂµÄÄ³¸öÎÄ¼ş£¬ÒÔÎÄ¼şÎ²Îª½áÊø\n\
-Óï·¨¸ñÊ½    write name type [offset]\n\
-name        Ğ´ÈëÎÄ¼şÃû\n\
-type        Ğ´ÈëÄ£Ê½0½Ø¶Ï 1×·¼Ó 2¸²¸Ç\n\
-ÈôÊÇ¸²¸ÇĞ´ÔòoffsetÓĞĞ§£¬Îª¸²¸ÇµÄÆğÊ¼Î»ÖÃ\n";
+åŠŸèƒ½        å†™å…¥å½“å‰ç›®å½•ä¸‹çš„æŸä¸ªæ–‡ä»¶ï¼Œä»¥æ–‡ä»¶å°¾ä¸ºç»“æŸ\n\
+è¯­æ³•æ ¼å¼    write name type [offset]\n\
+name        å†™å…¥æ–‡ä»¶å\n\
+type        å†™å…¥æ¨¡å¼0æˆªæ–­ 1è¿½åŠ  2è¦†ç›–\n\
+è‹¥æ˜¯è¦†ç›–å†™åˆ™offsetæœ‰æ•ˆï¼Œä¸ºè¦†ç›–çš„èµ·å§‹ä½ç½®\n";
  	// FAT_DS_BLOCK4K fat_ds;
     char name[12];
     int type=-1;
     u32 offset=0;
     if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-        printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+        strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+        printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
         return ERROR;
     }
     switch(arg->len){
@@ -30,8 +30,8 @@ type        Ğ´ÈëÄ£Ê½0½Ø¶Ï 1×·¼Ó 2¸²¸Ç\n\
             }
     	case 2:
             if(nameCheckChange(arg->argv[0],name)==ERROR){
-                strcpy(error.msg,"ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n\x00");
-                printf("ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n");
+                strcpy(error.msg,"æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n\x00");
+                printf("æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n");
                 return ERROR;
             }
             for(int i=0;i<11;i++){
@@ -45,8 +45,8 @@ type        Ğ´ÈëÄ£Ê½0½Ø¶Ï 1×·¼Ó 2¸²¸Ç\n\
                     goto error;
                 }
             }else if(type==INF){
-                strcpy(error.msg,"Ğ´ÈëÄ£Ê½·Ç·¨\n\x00");
-                printf("Ğ´ÈëÄ£Ê½·Ç·¨\n");
+                strcpy(error.msg,"å†™å…¥æ¨¡å¼éæ³•\n\x00");
+                printf("å†™å…¥æ¨¡å¼éæ³•\n");
                 return ERROR; 
             }else{
                 if(arg->len!=2){
@@ -67,8 +67,8 @@ type        Ğ´ÈëÄ£Ê½0½Ø¶Ï 1×·¼Ó 2¸²¸Ç\n\
     		break;
     	default:
     	error:;
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     
@@ -89,12 +89,12 @@ type        Ğ´ÈëÄ£Ê½0½Ø¶Ï 1×·¼Ó 2¸²¸Ç\n\
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
                         if(offset>fat_ds.fat[cut].DIR_FileSize){
-                            printf("¸²¸ÇÎ»ÖÃ·Ç·¨\n");
+                            printf("è¦†ç›–ä½ç½®éæ³•\n");
                             return SUCCESS;
                         }
                         int num=0;
                         char buf[ARGLEN*10];
-                        printf("ÒÔEOF½áÊø\n");
+                        printf("ä»¥EOFç»“æŸ\n");
                         int first=0;
                         int writelen=0;
                         while(scanf("%c",&buf[num])!=EOF && buf[num]!=26){
@@ -113,13 +113,13 @@ type        Ğ´ÈëÄ£Ê½0½Ø¶Ï 1×·¼Ó 2¸²¸Ç\n\
                         return SUCCESS;
                     }
                 }
-                printf("ÎÄ¼şÎ´´ò¿ª\n");
+                printf("æ–‡ä»¶æœªæ‰“å¼€\n");
                 return SUCCESS;
             }
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-    printf("ÎÄ¼ş²»´æÔÚ\n");
+    printf("æ–‡ä»¶ä¸å­˜åœ¨\n");
 
 
 
@@ -131,7 +131,7 @@ int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop file
     }
     FAT_DS_BLOCK4K fat_ds;
     Opendfilep opendf = &(fileSystemInfop->Opendf[fnum]);
-    /* Ğ´ÈëÎ´´ò¿ªµÄÎÄ¼ş */
+    /* å†™å…¥æœªæ‰“å¼€çš„æ–‡ä»¶ */
     if(opendf->flag==FALSE){
         return 0;
     }
@@ -163,31 +163,31 @@ int write_in(int fnum,int type,u32 start,u32 size,void* buf,FileSystemInfop file
             return write_real(fnum,lin,size,buf,fileSystemInfop);
             break;
         default:
-            /* ÀàĞÍ·Ç·¨ */
+            /* ç±»å‹éæ³• */
             return -2;
     }
 }
 
 int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop){
     FAT_DS_BLOCK4K fat_ds;
-    /* ÎÄ¼şÃèÊö·û·Ç·¨ */
+    /* æ–‡ä»¶æè¿°ç¬¦éæ³• */
     if(fnum<0&&fnum>=OPENFILESIZE){
         return -1;
     }
-    /* ÆğÊ¼Î»ÖÃ·Ç·¨ */
-    /* Ğ´Èë³¤¶È·Ç·¨ */
+    /* èµ·å§‹ä½ç½®éæ³• */
+    /* å†™å…¥é•¿åº¦éæ³• */
     if(size==0){
         return 0;
     }
     Opendfilep opendf = &(fileSystemInfop->Opendf[fnum]);
-    /* Ğ´ÈëÎ´´ò¿ªµÄÎÄ¼ş */
+    /* å†™å…¥æœªæ‰“å¼€çš„æ–‡ä»¶ */
     if(opendf->flag==FALSE){
         return 0;
     }
-    /* Ç¿ÖÆÒÆ¶¯ÎÄ¼şÖ¸Õë */
+    /* å¼ºåˆ¶ç§»åŠ¨æ–‡ä»¶æŒ‡é’ˆ */
     do_read_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds,L2R(fileSystemInfop,opendf->Dir_Clus));
 	int fileclus = (u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
-    /* 0À©Õ¹±êÖ¾ */
+    /* 0æ‰©å±•æ ‡å¿— */
     int flagZero=FALSE;
     if(fileclus==FAT_FREE){
         fileclus=newfree(fileSystemInfop,0);
@@ -198,7 +198,7 @@ int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemI
         flagZero=TRUE;
     }
     // DEBUG("%d\n",SPCSIZE*ceil(fat_ds.fat[opendf->numID].DIR_FileSize/(1.0*SPCSIZE)));
-    // /* ÎÄ¼ş³¤¶È4k¶ÔÆä  ²¢Ç¿ÖÆÒÆ¶¯*/
+    // /* æ–‡ä»¶é•¿åº¦4kå¯¹å…¶  å¹¶å¼ºåˆ¶ç§»åŠ¨*/
     // int lin=fat_ds.fat[opendf->numID].DIR_FileSize;
     // if(lin%SPCSIZE!=0){
     //     lin=(lin/SPCSIZE+1)*SPCSIZE;
@@ -218,7 +218,7 @@ int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemI
     // }
     opendf->writep=start;
     BLOCK4K block4k;
-    /* Ñ°ÕÒÒªĞ´µÄ´ÅÅÌ¿é */
+    /* å¯»æ‰¾è¦å†™çš„ç£ç›˜å— */
     fileclus=(u32)( (((u32)fat_ds.fat[opendf->numID].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[opendf->numID].DIR_FstClusLO );
     for(u32 i=0;i<opendf->writep/SPCSIZE;i++){
         int old=fileclus;
@@ -234,19 +234,19 @@ int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemI
     if(flagZero==TRUE){
         fat_ds.fat[opendf->numID].DIR_FileSize=opendf->writep;
     }
-    /* ¿ªÊ¼Ğ´Èë */
+    /* å¼€å§‹å†™å…¥ */
     int len=size;
     int fileclusold;
-    /* 4kĞ´Èë²¹Æë */
+    /* 4kå†™å…¥è¡¥é½ */
     int writelen=0;
     if(opendf->writep%SPCSIZE!=0){
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
         int lin;
-        /* Ê£Óà¿Õ¼ä±ÈĞ´ÈëµÄ¿Õ¼ä´ó */
+        /* å‰©ä½™ç©ºé—´æ¯”å†™å…¥çš„ç©ºé—´å¤§ */
         if(len-writelen<(int)(SPCSIZE-(opendf->writep%SPCSIZE))){
             lin=len-writelen;
         }else{
-            /* ²¹Æë */
+            /* è¡¥é½ */
             lin=(SPCSIZE-opendf->writep%SPCSIZE);           
         }
         my_strcpy(&(((char*)&block4k)[(opendf->writep%SPCSIZE)]),(char*)(&((char*)buf)[writelen]),lin);
@@ -262,7 +262,7 @@ int write_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemI
     }
     
     while(len-writelen>0){
-        /* Ã»Ğ´Íêµ«µ½ÁË×îºóÒ»¿é */
+        /* æ²¡å†™å®Œä½†åˆ°äº†æœ€åä¸€å— */
         if(fileclus==FAT_END||fileclus==FAT_SAVE||FAT_FREE){
             fileclus=newfree(fileSystemInfop,fileclusold);
         }

@@ -106,7 +106,7 @@ char* my_strcpy(char *to,const char*from,int size ){
     return to;
 }
 
-//ȡ�ò��� 
+// 取得命令参数
 int getargv(ARGP argp){
     char cmd[ARGLEN*10];
     if(gets(cmd)==NULL){
@@ -141,7 +141,7 @@ int getargv(ARGP argp){
 }
 
 
-//�ַ���ת������ ���󷵻�INF
+//数字字符串转换为int类型数字,如果非法返回INF，不考虑溢出
 int ctoi(const char* ch){
     int ret=0;
     for(u32 i=0;i<strlen(ch);i++){

@@ -7,13 +7,13 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char name[12]; 
 	const char helpstr[]=
 "\
-¹¦ÄÜ        ´ò¿ªµ±Ç°Ä¿Â¼µÄÎÄ¼ş\n\
-Óï·¨¸ñÊ½    open name\n\
+åŠŸèƒ½        æ‰“å¼€å½“å‰ç›®å½•çš„æ–‡ä»¶\n\
+è¯­æ³•æ ¼å¼    open name\n\
 		   \n";
  	FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-        printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+        strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+        printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
         return ERROR;
     }
     switch(arg->len){
@@ -23,8 +23,8 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
     			return SUCCESS;
     		}else{
 				if(nameCheckChange(arg->argv[0],name)==ERROR){
-                    strcpy(error.msg,"ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n\x00");
-                    printf("ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n");
+                    strcpy(error.msg,"æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n\x00");
+                    printf("æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n");
                     return ERROR;
                 }
                 for(int i=0;i<11;i++){
@@ -38,8 +38,8 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
     		break;
     	default:
     	error:;
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     
@@ -57,18 +57,18 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
             
             if(strcmp(lin,name)==0){
             	if(fat_ds.fat[cut].DIR_Attr&ATTR_DIRECTORY){
-            		printf("²»ÄÜ´ò¿ªÎÄ¼ş¼Ğ\n");
-            		strcpy(error.msg,"²»ÄÜ´ò¿ªÎÄ¼ş¼Ğ\n\x00");
+            		printf("ä¸èƒ½æ‰“å¼€æ–‡ä»¶å¤¹\n");
+            		strcpy(error.msg,"ä¸èƒ½æ‰“å¼€æ–‡ä»¶å¤¹\n\x00");
             		return SUCCESS;
             	} 
             	else{
             		fileclus = (u32)( (((u32)fat_ds.fat[cut].DIR_FstClusHI)<<16) |(u32)fat_ds.fat[cut].DIR_FstClusLO );
             		for(int i =0;i<OPENFILESIZE;i++){
-            			//Ö»ÄÜ´ò¿ªÒ»´ÎÎÄ¼ş
+            			//åªèƒ½æ‰“å¼€ä¸€æ¬¡æ–‡ä»¶
             			opendf = &(fileSystemInfop->Opendf[i]);
             			if(opendf->flag == TRUE){
             				if((opendf->Dir_Clus == pathNum)&&(opendf->File_Clus ==fileclus) && (strcmp(opendf->File_name,name)==0)){
-            					printf("Ö»ÄÜ´ò¿ªÒ»´ÎÎÄ¼ş\n");
+            					printf("åªèƒ½æ‰“å¼€ä¸€æ¬¡æ–‡ä»¶\n");
             					return SUCCESS;
             				}
             				else continue;
@@ -80,11 +80,11 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
 							opendf->writep = 0;
 							opendf->numID = cut;
             				strcpy(opendf->File_name,name);
-	            			printf("%s%d\n","´ò¿ªÎÄ¼ş³É¹¦ ÎÄ¼şÃèÊö·ûÊÇ",i);
+	            			printf("%s%d\n","æ‰“å¼€æ–‡ä»¶æˆåŠŸ æ–‡ä»¶æè¿°ç¬¦æ˜¯",i);
 	            			return SUCCESS;
             			}
             		}
-            		printf("´ò¿ªÎÄ¼şÊıÒÑ´ïµ½×î´ó£¬´ò¿ªÊ§°Ü\n");
+            		printf("æ‰“å¼€æ–‡ä»¶æ•°å·²è¾¾åˆ°æœ€å¤§ï¼Œæ‰“å¼€å¤±è´¥\n");
             		return SUCCESS;
 
 
@@ -95,6 +95,6 @@ int my_open(const ARGP arg,FileSystemInfop fileSystemInfop){
         }
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-	printf("Î´ÕÒµ½Ä¿±êÎÄ¼ş£¬´ò¿ªÊ§°Ü!\n");
+	printf("æœªæ‰¾åˆ°ç›®æ ‡æ–‡ä»¶ï¼Œæ‰“å¼€å¤±è´¥!\n");
 	return SUCCESS;
 }

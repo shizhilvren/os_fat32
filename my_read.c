@@ -3,24 +3,24 @@
 #include"tool.h"
 #include<memory.h>
 #include<ctype.h>
-//¶ÁÈ¡ÎÄ¼ş×î´ó³¤¶ÈÎª4098×Ö½Ú
+//è¯»å–æ–‡ä»¶æœ€å¤§é•¿åº¦ä¸º4098å­—èŠ‚
 #define MAXLEN 4098
 int my_read(const ARGP arg,FileSystemInfop fileSystemInfop){
 	char name[12]; 
 	u32 start=0;
-	/* 0Îª¶ÁÈ¡ËùÓĞ */
+	/* 0ä¸ºè¯»å–æ‰€æœ‰ */
 	u32 len=0; 
 	const char helpstr[]=
 "\
-¹¦ÄÜ        ¶ÁÈ¡ÎÄ¼şÄÚÈİ\n\
-Óï·¨¸ñÊ½    read name [len[start]]\n\
-name	   Òª¶ÁµÄÎÄ¼şÃû\n\
-len			¶ÁÈ¡µÃÎÄ¼ş³¤¶È Ä¬ÈÏÎªËùÓĞ\n\
-start		¶ÁÈ¡µÄ¿ªÊ¼Î»ÖÃ Ä¬ÈÏÎª0\n";
+åŠŸèƒ½        è¯»å–æ–‡ä»¶å†…å®¹\n\
+è¯­æ³•æ ¼å¼    read name [len[start]]\n\
+name	   è¦è¯»çš„æ–‡ä»¶å\n\
+len			è¯»å–å¾—æ–‡ä»¶é•¿åº¦ é»˜è®¤ä¸ºæ‰€æœ‰\n\
+start		è¯»å–çš„å¼€å§‹ä½ç½® é»˜è®¤ä¸º0\n";
  	FAT_DS_BLOCK4K fat_ds;
     if(fileSystemInfop->flag==FALSE){
-        strcpy(error.msg,"Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n\x00");
-        printf("Î´Ö¸¶¨ÎÄ¼şÏµÍ³\n");
+        strcpy(error.msg,"æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n\x00");
+        printf("æœªæŒ‡å®šæ–‡ä»¶ç³»ç»Ÿ\n");
         return ERROR;
     }
     switch(arg->len){
@@ -40,8 +40,8 @@ start		¶ÁÈ¡µÄ¿ªÊ¼Î»ÖÃ Ä¬ÈÏÎª0\n";
     			return SUCCESS;
     		}else{
 				if(nameCheckChange(arg->argv[0],name)==ERROR){
-                    strcpy(error.msg,"ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n\x00");
-                    printf("ÎÄ¼şÃû¹ı³¤»ò´æÔÚ·Ç·¨×Ö·û\n");
+                    strcpy(error.msg,"æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n\x00");
+                    printf("æ–‡ä»¶åè¿‡é•¿æˆ–å­˜åœ¨éæ³•å­—ç¬¦\n");
                     return ERROR;
                 }
                 for(int i=0;i<11;i++){
@@ -53,8 +53,8 @@ start		¶ÁÈ¡µÄ¿ªÊ¼Î»ÖÃ Ä¬ÈÏÎª0\n";
     		break;
     	default:
     	error:;
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     
@@ -69,11 +69,11 @@ start		¶ÁÈ¡µÄ¿ªÊ¼Î»ÖÃ Ä¬ÈÏÎª0\n";
 			my_strcpy(lin,fat_ds.fat[cut].name,11);
 			lin[11]='\0';
 			if(fat_ds.fat[cut].name[0]=='\xe5'){
-				//±»É¾³ıµÄ
+				//è¢«åˆ é™¤çš„
 				continue;
 			}
             if((fat_ds.fat[cut].DIR_Attr&ATTR_ARCHIVE) && strcmp(name,lin)==0){ 
-                //ÎÄ¼ş
+                //æ–‡ä»¶
 				for(int i=0;i<OPENFILESIZE;i++){
                     opendf = &(fileSystemInfop->Opendf[i]);
                     if(pathNum == opendf->Dir_Clus && opendf->flag==TRUE && strcmp(opendf->File_name,name)==0){
@@ -96,20 +96,20 @@ start		¶ÁÈ¡µÄ¿ªÊ¼Î»ÖÃ Ä¬ÈÏÎª0\n";
 						return SUCCESS;
                     }
                 }
-				printf("ÎÄ¼şÎ´´ò¿ª\n");
+				printf("æ–‡ä»¶æœªæ‰“å¼€\n");
 				return SUCCESS;
 			}
 		}
 		pathNum=getNext(fileSystemInfop,pathNum);
 	}while(pathNum!=FAT_FREE && pathNum!=FAT_END);
-	printf("ÎÄ¼ş²»´æÔÚ\n");
+	printf("æ–‡ä»¶ä¸å­˜åœ¨\n");
 	return SUCCESS;
 }
 
 int read_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemInfop){
 	FAT_DS_BLOCK4K fat_ds;
 	BLOCK4K block4k;
-    /* ÎÄ¼şÃèÊö·û·Ç·¨ */
+    /* æ–‡ä»¶æè¿°ç¬¦éæ³• */
     if(fnum<0&&fnum>=OPENFILESIZE){
         return -1;
     }
@@ -135,7 +135,7 @@ int read_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemIn
 	}
 	u32 len=size;
 	opendf->readp=start;
-    /* 4k¶ÁÈëÈë²¹Æë */
+    /* 4kè¯»å…¥å…¥è¡¥é½ */
 	int readlen=0;
     if(opendf->readp%SPCSIZE!=0){
         do_read_block4k(fileSystemInfop->fp,&block4k,L2R(fileSystemInfop,fileclus));
@@ -176,20 +176,20 @@ int read_real(int fnum,u32 start,u32 size,void* buf,FileSystemInfop fileSystemIn
 // 	Opendfilep opendf;
 	
 // 	if( fd >=OPENFILESIZE || fd < 0 ){
-// 		printf("%s\n","ÎÄ¼şÃèÊö·û²»ºÏ·¨");
+// 		printf("%s\n","æ–‡ä»¶æè¿°ç¬¦ä¸åˆæ³•");
 // 		return ERROR;
 // 	}
 // 	opendf = &(fileSystemInfop->Opendf[fd]);
 
 // 	if( opendf->flag == FALSE ){
-// 		printf("%s\n","¸ø¶¨ÎÄ¼şÃèÊö·ûÎŞĞ§");
+// 		printf("%s\n","ç»™å®šæ–‡ä»¶æè¿°ç¬¦æ— æ•ˆ");
 // 		return ERROR;
 // 	}else{
 // 		u32 pathNum=opendf->Dir_Clus;
 // 		FAT_DS_BLOCK4K fat_ds;
 // 		readBytes = do_read(fd,len,text);
 // 		//text[readBytes] = '\0';
-// 		//½«½á¹ûÊä³öµ½ÆÁÄ»
+// 		//å°†ç»“æœè¾“å‡ºåˆ°å±å¹•
 // 		for(int i=0;text[i]!='\0';i++){
 // 			printf("%s",text[i]);
 // 		}

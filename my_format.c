@@ -3,14 +3,14 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-/* ´æÔÚËæ»ú¸ùÄ¿Â¼dirÂÒÂë Ô­Òò²»Ã÷ */
+/* å­˜åœ¨éšæœºæ ¹ç›®å½•dirä¹±ç  åŸå› ä¸æ˜ */
 /*
-    ½ÓÊÜÒ»¸ö²ÎÊı ²»µÃĞ¡ÓÚ256MB ²»µÃ´óÓÚ2097152MB(2TB)
-    Ä¬ÈÏÒ»¸ö´ÅÅÌ¿é512B Ò»´Ø4KB 8¸ö¿é
+    æ¥å—ä¸€ä¸ªå‚æ•° ä¸å¾—å°äº256MB ä¸å¾—å¤§äº2097152MB(2TB)
+    é»˜è®¤ä¸€ä¸ªç£ç›˜å—512B ä¸€ç°‡4KB 8ä¸ªå—
 */
 #define MIN 256
 #define MAX 2097152
-//µ¥Î»×Ö½Ú
+//å•ä½å­—èŠ‚
 void vhdset(HD_FTRp vhd,u64 size){
     strcpy(vhd->cookie,"conectix");
     vhd->features=BigtoLittle32(0x00000002);
@@ -24,7 +24,7 @@ void vhdset(HD_FTRp vhd,u64 size){
     vhd->orig_size=BigtoLittle64(size);
     vhd->curr_size=BigtoLittle64(size);
     vhd->geometry=BigtoLittle32(0x03eb0c11);
-    vhd->type=BigtoLittle32(2); //ÀàĞÍ
+    vhd->type=BigtoLittle32(2); //ç±»å‹
     vhd->checksum=0;
     // strcmp(vhd->uuid,"                ");
     memset(vhd->uuid,0xff,sizeof(vhd->uuid));
@@ -36,7 +36,7 @@ void vhdset(HD_FTRp vhd,u64 size){
     }
     vhd->checksum=BigtoLittle32(~chksum);
 }
-//sizeÎª×Ö½ÚÊı
+//sizeä¸ºå­—èŠ‚æ•°
 void MBRset(MBRp mbr,int size){
     mbr->sign=0x12345678;
     (mbr->mbr_in[0]).flag=0;
@@ -54,7 +54,7 @@ void FSInfoset(FSInfop fsi){
     fsi->end=0xAA550000;
 }
 
-//size Îª×Ö½ÚÊı
+//size ä¸ºå­—èŠ‚æ•°
 void BS_BPSset(BS_BPBp bs_bpb,int size,int hiden){
     my_strcpy(bs_bpb->BS_jmpBoot,"\xEB\x58\x90",sizeof(bs_bpb->BS_jmpBoot));
     my_strcpy(bs_bpb->BS_OEMName,"MSDOS5.0",sizeof(bs_bpb->BS_OEMName));
@@ -72,7 +72,7 @@ void BS_BPSset(BS_BPBp bs_bpb,int size,int hiden){
     bs_bpb->BPB_TotSec32=size/BLOCKSIZE;
 
     int x=size/SPCSIZE/(512/4);
-    bs_bpb->BPB_FATSz32=x+(8-x%8);//Ç¿ÖÆ4k¶ÔÆë
+    bs_bpb->BPB_FATSz32=x+(8-x%8);//å¼ºåˆ¶4kå¯¹é½
     bs_bpb->BPB_ExtFlags=0;
     bs_bpb->BPB_FSVer=0;
     bs_bpb->BPB_RootClis=2;
@@ -93,11 +93,11 @@ int my_format(const ARGP arg){
     char fileName[ARGLEN]="fs.vhd";
     const char helpstr[]=
 "\
-¹¦ÄÜ         ¸ñÊ½»¯ÎÄ¼şÏµÍ³\n\
-Óï·¨¸ñÊ½     format size [name [namefile]]\n\
-szie        ´ÅÅÌ´óĞ¡ µ¥Î»MB\n\
-name        ¾í±êÃû  Ä¬ÈÏ WTL\n\
-namefile    ĞéÄâ´ÅÅÌÎÄ¼şÂ·¾¶£¨µ±Ç°Ä¿Â¼ÏÂ¿ªÊ¼£© Ä¬ÈÏ fs.vhd\n";
+åŠŸèƒ½         æ ¼å¼åŒ–æ–‡ä»¶ç³»ç»Ÿ\n\
+è¯­æ³•æ ¼å¼     format size [name [namefile]]\n\
+szie        ç£ç›˜å¤§å° å•ä½MB\n\
+name        å·æ ‡å  é»˜è®¤ WTL\n\
+namefile    è™šæ‹Ÿç£ç›˜æ–‡ä»¶è·¯å¾„ï¼ˆå½“å‰ç›®å½•ä¸‹å¼€å§‹ï¼‰ é»˜è®¤ fs.vhd\n";
     DEBUG("%d",sizeof(BS_BPB));
     BLOCK4K block4k;
     FILE *fp=NULL;
@@ -115,43 +115,43 @@ namefile    ĞéÄâ´ÅÅÌÎÄ¼şÂ·¾¶£¨µ±Ç°Ä¿Â¼ÏÂ¿ªÊ¼£© Ä¬ÈÏ fs.vhd\n";
             }
             break;
         default:
-            strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-            printf("²ÎÊıÊıÁ¿´íÎó\n");
+            strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+            printf("å‚æ•°æ•°é‡é”™è¯¯\n");
             return ERROR;
     }
     // if(arg->len>3){
-    //     strcpy(error.msg,"²ÎÊıÊıÁ¿´íÎó\n\x00");
-    //     printf("²ÎÊıÊıÁ¿´íÎó\n");
+    //     strcpy(error.msg,"å‚æ•°æ•°é‡é”™è¯¯\n\x00");
+    //     printf("å‚æ•°æ•°é‡é”™è¯¯\n");
     //     return ERROR;
     // }
     
     DEBUG("%s %d",arg->argv[0],ctoi(arg->argv[0]));
     int size=ctoi(arg->argv[0]);
     if(size<MIN||size>MAX){
-        strcpy(error.msg,"´ÅÅÌÈİÁ¿Á¿´íÎó\n\x00");
-        printf("´ÅÅÌÈİÁ¿Á¿´íÎó\n");
+        strcpy(error.msg,"ç£ç›˜å®¹é‡é‡é”™è¯¯\n\x00");
+        printf("ç£ç›˜å®¹é‡é‡é”™è¯¯\n");
         return ERROR;
     }
     int cut=size*K*K/SPCSIZE;
     DEBUG("%d %d\n",sizeof(BLOCK),sizeof(BLOCK4K));
     fp=fopen(fileName,"wb");
     if(fp==NULL){
-        strcpy(error.msg,"ÎÄ¼ş´ò¿ª´íÎó\n\x00");
-        printf("ÎÄ¼ş´ò¿ªÁ¿´íÎó\n");
+        strcpy(error.msg,"æ–‡ä»¶æ‰“å¼€é”™è¯¯\n\x00");
+        printf("æ–‡ä»¶æ‰“å¼€é‡é”™è¯¯\n");
         return ERROR;
     }
 
-    //Éú³ÉÎÄ¼ş±¾Ìå
+    //ç”Ÿæˆæ–‡ä»¶æœ¬ä½“
     memset(&block4k,0,SPCSIZE);
     for(int i=0;i<cut;i++){
         do_write_block4k(fp,&block4k,-1);
     }
-    //´¦Àívhd¸ñÊ½
+    //å¤„ç†vhdæ ¼å¼
     HD_FTR vhd;
     vhdset(&vhd,size*K*K);
     do_write_block(fp,(BLOCK*)&vhd,-1,0);
     
-    //´ÅÅÌ·ÖÇø
+    //ç£ç›˜åˆ†åŒº
     MBR mbr;
     MBRset(&mbr,size*K*K);
     do_write_block(fp,(BLOCK*)&mbr,0,0);
@@ -163,9 +163,9 @@ namefile    ĞéÄâ´ÅÅÌÎÄ¼şÂ·¾¶£¨µ±Ç°Ä¿Â¼ÏÂ¿ªÊ¼£© Ä¬ÈÏ fs.vhd\n";
         mbr.mbr_in[0].strart_chan);
     do_write_block(fp,(BLOCK*)&bs_pbp,mbr.mbr_in[0].strart_chan*BLOCKSIZE/SPCSIZE,(mbr.mbr_in[0].strart_chan*BLOCKSIZE%SPCSIZE)/BLOCKSIZE);
     
-    //³õÊ¼»¯¸ùÄ¿Â¼
+    //åˆå§‹åŒ–æ ¹ç›®å½•
     int start=bs_pbp.BPB_FATSz32*bs_pbp.BPB_NumFATs+bs_pbp.BPB_RsvdSecCnt+mbr.mbr_in[0].strart_chan+(bs_pbp.BPB_RootClis-2)*bs_pbp.BPB_SecPerClus;
-    DEBUG("¿ªÊ¼ÉÈÇø %d\n",start);
+    DEBUG("å¼€å§‹æ‰‡åŒº %d\n",start);
 
     BLOCK block;
     FAT_DSp fatdsp=(FAT_DSp)&block;
@@ -180,7 +180,7 @@ namefile    ĞéÄâ´ÅÅÌÎÄ¼şÂ·¾¶£¨µ±Ç°Ä¿Â¼ÏÂ¿ªÊ¼£© Ä¬ÈÏ fs.vhd\n";
     // do_write_block(fp,(BLOCK*)&bs_pbp,mbr.mbr_in[0].strart_chan*BLOCKSIZE/SPCSIZE,(mbr.mbr_in[0].strart_chan*BLOCKSIZE%SPCSIZE)/BLOCKSIZE);
     do_write_block(fp,(BLOCK*)&fsi,mbr.mbr_in[0].strart_chan*BLOCKSIZE/SPCSIZE,(mbr.mbr_in[0].strart_chan*BLOCKSIZE%SPCSIZE)/BLOCKSIZE+1);
     
-    //fatÉèÖÃ (¸ùÄ¿Â¼³õÊ¼»¯)
+    //fatè®¾ç½® (æ ¹ç›®å½•åˆå§‹åŒ–)
     int str_fat1;
     str_fat1=bs_pbp.BPB_RsvdSecCnt+mbr.mbr_in[0].strart_chan;
     int str_fat2=bs_pbp.BPB_RsvdSecCnt+bs_pbp.BPB_FATSz32+mbr.mbr_in[0].strart_chan;
@@ -195,7 +195,7 @@ namefile    ĞéÄâ´ÅÅÌÎÄ¼şÂ·¾¶£¨µ±Ç°Ä¿Â¼ÏÂ¿ªÊ¼£© Ä¬ÈÏ fs.vhd\n";
     do_write_block(fp,(BLOCK*)&fat,str_fat2/8,str_fat2%8);
 
     fclose(fp);
-    DEBUG("´ÅÅÌÉêÇë³É¹¦\n");
+    DEBUG("ç£ç›˜ç”³è¯·æˆåŠŸ\n");
     // if()
     return SUCCESS;
 }
