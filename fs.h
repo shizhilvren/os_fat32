@@ -2,6 +2,7 @@
 #define __FS__
 
 #include<stdio.h>
+#include<string.h>
 
 #define ARGNUM      10   /* 最大参数数量 */
 #define ARGLEN      1024 /*  单一参数最大长度 */
