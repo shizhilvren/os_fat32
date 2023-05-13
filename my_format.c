@@ -169,7 +169,8 @@ namefile    虚拟磁盘文件路径（当前目录下开始） 默认 fs.vhd\n"
 
     BLOCK block;
     FAT_DSp fatdsp=(FAT_DSp)&block;
-    memset(fatdsp,0,sizeof(FAT_DS));
+//     memset(fatdsp,0,sizeof(FAT_DS));
+    memset(&block, 0, sizeof(block));
     my_strcpy(fatdsp->name,fatName,8);
     my_strcpy(fatdsp->named,"   ",3);
     fatdsp->DIR_Attr=ATTR_VOLUME_ID;
