@@ -35,6 +35,7 @@ int do_read_block4k(FILE* fp, BLOCK4K* block4k, int offset)
     if (offset == -1) {
         ret = fread(block4k, sizeof(BLOCK4K), 1, fp);
     } else {
+        DEBUG("read4k %d %x-%x\n", offset, offset * SPCSIZE, offset * SPCSIZE + sizeof(BLOCK4K));
         fseek(fp, offset * SPCSIZE, SEEK_SET);
         ret = fread(block4k, sizeof(BLOCK4K), 1, fp);
     }
@@ -42,7 +43,7 @@ int do_read_block4k(FILE* fp, BLOCK4K* block4k, int offset)
 }
 int do_read_block(FILE* fp, BLOCK* block, int offset, int num)
 {
-    
+
     int ret = -1;
     if (offset == -1) {
         ret = fread(block, sizeof(BLOCK), 1, fp);
@@ -76,6 +77,7 @@ u32 getNext(FileSystemInfop fsip, u32 num)
 
 int newfree(FileSystemInfop fsip, u32 num)
 {
+
     FAT fat;
     u32 cuNum = num / (512 / 4);
     u32 index = num % (512 / 4);
@@ -84,19 +86,20 @@ int newfree(FileSystemInfop fsip, u32 num)
         for (int j = 0; j < 512 / 4; j++) {
             if (fat.fat[j] == FAT_FREE) {
                 fat.fat[j] = FAT_END;
-                for (int i = 0; i < fsip->BPB_NumFATs; i++) {
-                    do_write_block(fsip->fp, (BLOCK*)&fat, (fsip->FAT[i] + i) / 8, (fsip->FAT[i] + i) % 8);
+                for (int k = 0; k < fsip->BPB_NumFATs; k++) {
+                    do_write_block(fsip->fp, (BLOCK*)&fat, (fsip->FAT[k] + i) / 8, (fsip->FAT[k] + i) % 8);
                 }
                 if (num != 0) {
                     do_read_block(fsip->fp, (BLOCK*)&fat, (fsip->FAT[0] + cuNum) / 8, (fsip->FAT[0] + cuNum) % 8);
                     fat.fat[index] = i * (512 / 4) + j;
-                    for (int i = 0; i < fsip->BPB_NumFATs; i++) {
-                        do_write_block(fsip->fp, (BLOCK*)&fat, (fsip->FAT[i] + cuNum) / 8, (fsip->FAT[i] + cuNum) % 8);
+                    for (int k = 0; k < fsip->BPB_NumFATs; k++) {
+                        do_write_block(fsip->fp, (BLOCK*)&fat, (fsip->FAT[k] + cuNum) / 8, (fsip->FAT[k] + cuNum) % 8);
                     }
                 }
                 BLOCK4K block4k;
                 memset(&block4k, 0, SPCSIZE);
                 do_write_block4k(fsip->fp, &block4k, L2R(fsip, i * (512 / 4) + j));
+                DEBUG("new link %d->%d %d %d\n", num, i * (512 / 4) + j, i, j);
                 return i * (512 / 4) + j;
             }
         }

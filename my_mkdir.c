@@ -68,6 +68,7 @@ name       创建文件夹的名字\n\
     }
 
     u32 pathNum=fileSystemInfop->pathNum;
+    u32 pathNum_dir_root=fileSystemInfop->pathNum;
     u32 cut;
     while(TRUE){
         //检查这一页的目录项
@@ -113,8 +114,8 @@ name       创建文件夹的名字\n\
             fat_ds_d.fat[1].DIR_Attr=ATTR_DIRECTORY;
             fat_ds_d.fat[0].DIR_FstClusHI=(u16)(pathnumd>>16);
             fat_ds_d.fat[0].DIR_FstClusLO=(u16)(pathnumd&0x0000ffff);
-            fat_ds_d.fat[1].DIR_FstClusHI=(u16)(pathNum>>16);
-            fat_ds_d.fat[1].DIR_FstClusLO=(u16)(pathNum&0x0000ffff);
+            fat_ds_d.fat[1].DIR_FstClusHI=(u16)(pathNum_dir_root>>16);
+            fat_ds_d.fat[1].DIR_FstClusLO=(u16)(pathNum_dir_root&0x0000ffff);
             do_write_block4k(fileSystemInfop->fp,(BLOCK4K*)&fat_ds_d,L2R(fileSystemInfop,pathnumd));
             
             memset(&fat_ds.fat[cut],0,sizeof(FAT_DS));
